@@ -1,0 +1,5 @@
+{
+    "plugin_name": "group_signature_api",
+    "plugin_namespace": "group_signature",
+    "plugin_project": "group_signature_api_plugin"
+}
