@@ -11,8 +11,10 @@
 #ifdef IS_TEST_NET
 #define STEEM_BLOCKCHAIN_VERSION              ( version(0, 22, 0) )
 
-#define STEEM_INIT_PRIVATE_KEY                (fc::ecc::private_key::regenerate(fc::sha256::hash(std::string("init_key"))))
-#define STEEM_INIT_PUBLIC_KEY_STR             (std::string( steem::protocol::public_key_type(STEEM_INIT_PRIVATE_KEY.get_public_key()) ))
+#define STEEM_INIT_PRIVATE_KEY                (fc::ecc::private_key::regenerate(fc::sha256::hash(std::string("initminer2"))))
+// #define STEEM_INIT_PRIVATE_KEY                (std::string("5JHKRW4d7BTU1V1CXDQAPmDfBBFr6XqQoDDUpmPP1JW38s5NjeW"))
+
+#define STEEM_INIT_PUBLIC_KEY_STR             (std::string("TST8QQ8wVz44d4AMPK5YYa7ZoKvXHccm8KqDrRvHSDgwJUG1Sf2wA"))
 #define STEEM_CHAIN_ID (fc::sha256::hash("testnet"))
 #define STEEM_ADDRESS_PREFIX                  "TST"
 
@@ -86,7 +88,7 @@
 #define STEEM_START_VESTING_BLOCK             (STEEM_BLOCKS_PER_DAY * 7)
 #define STEEM_START_MINER_VOTING_BLOCK        (STEEM_BLOCKS_PER_DAY * 30)
 
-#define STEEM_INIT_MINER_NAME                 "initminer"
+#define STEEM_INIT_MINER_NAME                 "initminer2"
 #define STEEM_NUM_INIT_MINERS                 1
 #define STEEM_INIT_TIME                       (fc::time_point_sec());
 
@@ -100,7 +102,7 @@
 #define STEEM_MAX_MINER_WITNESSES_HF17        0
 #define STEEM_MAX_RUNNER_WITNESSES_HF17       1
 
-#define STEEM_HARDFORK_REQUIRED_WITNESSES     17 // 17 of the 21 dpos witnesses (20 elected and 1 virtual time) required for hardfork. This guarantees 75% participation on all subsequent rounds.
+#define STEEM_HARDFORK_REQUIRED_WITNESSES     1 // 17 of the 21 dpos witnesses (20 elected and 1 virtual time) required for hardfork. This guarantees 75% participation on all subsequent rounds.
 #define STEEM_MAX_TIME_UNTIL_EXPIRATION       (60*60) // seconds,  aka: 1 hour
 #define STEEM_MAX_MEMO_SIZE                   2048
 #define STEEM_MAX_PROXY_RECURSION_DEPTH       4

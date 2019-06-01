@@ -4,7 +4,7 @@ add_library( group_signature_api_plugin
              group_signature_api.cpp
              ${HEADERS}
             )
-target_link_libraries( group_signature_api_plugin json_rpc_plugin )
+target_link_libraries( group_signature_api_plugin group_signature_plugin  json_rpc_plugin )
 target_include_directories( group_signature_api_plugin PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
 if( CLANG_TIDY_EXE )

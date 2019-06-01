@@ -1,5 +1,9 @@
 #pragma once
+#include <steem/chain/steem_fwd.hpp>
+
 #include <steem/plugins/json_rpc/json_rpc_plugin.hpp>
+
+#include <steem/plugins/group_signature/group_signature_plugin.hpp>
 
 #include <appbase/application.hpp>
 
@@ -11,7 +15,10 @@ namespace steem { namespace plugins { namespace group_signature {
     class group_signature_api_plugin : public appbase::plugin< group_signature_api_plugin >
     {
         public:
-        APPBASE_PLUGIN_REQUIRES((steem::plugins::json_rpc::json_rpc_plugin))
+        APPBASE_PLUGIN_REQUIRES(
+            (steem::plugins::group_signature::group_signature_plugin)
+            (steem::plugins::json_rpc::json_rpc_plugin)
+            )
 
         group_signature_api_plugin();
         virtual ~group_signature_api_plugin();
