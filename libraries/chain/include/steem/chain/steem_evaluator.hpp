@@ -50,8 +50,6 @@ STEEM_DEFINE_EVALUATOR( decline_voting_rights )
 STEEM_DEFINE_EVALUATOR( reset_account )
 STEEM_DEFINE_EVALUATOR( set_reset_account )
 STEEM_DEFINE_EVALUATOR( claim_reward_balance )
-STEEM_DEFINE_EVALUATOR( commit_paper )
-STEEM_DEFINE_EVALUATOR( aplly_open )
 #ifdef STEEM_ENABLE_SMT
 STEEM_DEFINE_EVALUATOR( claim_reward_balance2 )
 #endif

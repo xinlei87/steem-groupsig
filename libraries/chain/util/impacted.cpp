@@ -26,15 +26,6 @@ struct get_impacted_account_visitor
    }
 
    // ops
-   void operator()( const commit_paper_operation& op )
-   {
-      _impacted.insert( op.author );
-   }
-
-   void operator()( const apply_open_operation& op )
-   {
-      _impacted.insert( op.author );
-   }
 
    
    void operator()( const account_create_operation& op )

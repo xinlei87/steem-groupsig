@@ -139,3 +139,54 @@ FC_REFLECT( steem::chain::paper_content_object,
 
 CHAINBASE_SET_INDEX_TYPE( steem::chain::paper_content_object, steem::chain::paper_content_index )
 
+namespace helpers
+{
+    using steem::chain::shared_string;
+
+    template <>
+    class index_statistic_provider<steem::chain::paper_index>
+    {
+    public:
+        typedef steem::chain::paper_index IndexType;
+        
+        index_statistic_info gather_statistics(const IndexType& index, bool onlyStaticInfo) const
+        {
+            index_statistic_info info;
+            gather_index_static_data(index, &info);
+
+            if(onlyStaticInfo == false)
+            {
+                for(const auto& o : index)
+                {
+                    info._item_additional_allocation += o.permlink.capacity()*sizeof(shared_string::value_type);
+                }
+            }
+
+            return info;
+        }
+    };
+
+    template <>
+    class index_statistic_provider<steem::chain::paper_content_index>
+    {
+    public:
+        typedef steem::chain::paper_content_index IndexType;
+
+        index_statistic_info gather_statistics(const IndexType& index, bool onlyStaticInfo) const
+        {
+            index_statistic_info info;
+            gather_index_static_data(index, &info);
+
+            if(onlyStaticInfo == false)
+            {
+                for(const auto& o : index)
+                {
+                    info._item_additional_allocation += o.title.capacity()*sizeof(shared_string::value_type);
+                    info._item_additional_allocation += o.body.capacity()*sizeof(shared_string::value_type);
+                }
+            }
+
+            return info;
+        }
+    };
+}
