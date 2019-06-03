@@ -70,10 +70,14 @@ namespace steem { namespace protocol {
             create_proposal_operation,
             update_proposal_votes_operation,
             remove_proposal_operation,
+<<<<<<< HEAD
 //-------------------group_signature------------
             commit_paper_operation,
             apply_open_operation,
 //-----------------------------------------------
+=======
+
+>>>>>>> ad1bbc115244946d9a8882d3ff91832b6e4aa959
 #ifdef STEEM_ENABLE_SMT
             /// SMT operations
             claim_reward_balance2_operation,

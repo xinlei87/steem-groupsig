@@ -28,6 +28,7 @@ struct count_operation_visitor
            + _w.authority_account_member_size * auth.account_auths.size()
            + _w.authority_key_member_size * auth.key_auths.size();
    }
+<<<<<<< HEAD
 //----------------group_signature
    void operator()( const commit_paper_operation& op )const
    {
@@ -45,6 +46,9 @@ struct count_operation_visitor
       execution_time_count += _e.paper_operation_exec_time;
    }
 //------------------------------------------------------
+=======
+
+>>>>>>> ad1bbc115244946d9a8882d3ff91832b6e4aa959
    void operator()( const account_create_operation& op )const
    {
       state_bytes_count +=

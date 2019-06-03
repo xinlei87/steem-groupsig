@@ -2910,6 +2910,7 @@ void claim_reward_balance_evaluator::do_apply( const claim_reward_balance_operat
 
    _db.adjust_proxied_witness_votes( acnt, op.reward_vests.amount );
 }
+<<<<<<< HEAD
 //-------------------group_signature----------------------------
 void commit_paper_evaluator::do_apply( const commit_paper_operation& o ){
    //创建paper_object,并将其写入数据库中
@@ -2951,6 +2952,9 @@ void apply_open_evaluator::do_apply( const apply_paper_operation& o ){
    FC_CAPTURE_AND_RETHROW( (O) )
 }
 //----------------------------------------------------------------------------------------
+=======
+
+>>>>>>> ad1bbc115244946d9a8882d3ff91832b6e4aa959
 #ifdef STEEM_ENABLE_SMT
 void claim_reward_balance2_evaluator::do_apply( const claim_reward_balance2_operation& op )
 {
