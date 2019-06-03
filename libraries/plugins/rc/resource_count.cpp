@@ -28,12 +28,12 @@ struct count_operation_visitor
            + _w.authority_account_member_size * auth.account_auths.size()
            + _w.authority_key_member_size * auth.key_auths.size();
    }
-
+//----------------group_signature
    void operator()( const commit_paper_operation& op )const
    {
             state_bytes_count +=
-                 _w.comment_object_base_size
-               + _w.comment_object_permlink_char_size * op.permlink.size();
+                 _w.paper_object_base_size
+               + _w.paper_object_permlink_char_size * op.permlink.size();
 
             execution_time_count += _e.comment_operation_exec_time;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
    }
@@ -41,10 +41,10 @@ struct count_operation_visitor
    void operator()( const apply_open_operation& op )const
    {
       state_bytes_count += 
-           _w.comment_object_base_size
-      execution_time_count += _e.comment_operation_exec_time;
+           _w.paper_object_base_size
+      execution_time_count += _e.paper_operation_exec_time;
    }
-
+//------------------------------------------------------
    void operator()( const account_create_operation& op )const
    {
       state_bytes_count +=

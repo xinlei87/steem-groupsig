@@ -72,9 +72,10 @@ namespace steem { namespace plugins { namespace condenser_api {
    typedef comment_payout_update_operation        legacy_comment_payout_update_operation;
    typedef update_proposal_votes_operation        legacy_update_proposal_votes_operation;
    typedef remove_proposal_operation              legacy_remove_proposal_operation;
+//------------------group_signature---------------------------------------
    typedef commit_paper_operation                 legacy_commit_paper_operation;
    typedef apply_open_operation                   legacy_apply_open_operation;
-
+//----------------------------------------------------------
    struct legacy_price
    {
       legacy_price() {}
@@ -1094,8 +1095,10 @@ namespace steem { namespace plugins { namespace condenser_api {
             legacy_create_proposal_operation,
             legacy_update_proposal_votes_operation,
             legacy_remove_proposal_operation,
+//----------------------group_signature-------------
             legacy_commit_paper_operation,
             legacy_apply_open_operation
+//-------------------------------------------------
          > legacy_operation;
 
    struct legacy_operation_conversion_visitor
@@ -1135,9 +1138,10 @@ namespace steem { namespace plugins { namespace condenser_api {
       bool operator()( const comment_payout_update_operation& op )const          { l_op = op; return true; }
       bool operator()( const update_proposal_votes_operation& op )const          { l_op = op; return true; }
       bool operator()( const remove_proposal_operation& op )const                { l_op = op; return true; }
+//-------------------group_signature
       bool operator()( const commit_paper_operation& op )const                   { l_op = op; return true; }
       bool operator()( const apply_open_operation& op )const                     { l_op = op; return true; }
-
+//------------------------
       bool operator()( const transfer_operation& op )const
       {
          l_op = legacy_transfer_operation( op );

@@ -13,7 +13,7 @@ namespace steem { namespace plugins { namespace group_signature {
             {}
 
             ~group_signature_api_impl() {}
-
+            //参数必须写，可能是使用的函数定义不是用的 宏的问题？
             get_vk_return get_vk(const get_vk_args &args)
             {
                 get_vk_return a;
@@ -58,7 +58,6 @@ namespace steem { namespace plugins { namespace group_signature {
                 char temp4[400] ={'\0'};
                 element_snprintf(temp4,320,"%B", usk.b5);
                 key.b5 = temp4;
-                // element_printf("%B\n\n\n",usk.b5);
                 return key;
             }
         };

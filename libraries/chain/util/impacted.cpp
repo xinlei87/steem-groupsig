@@ -25,7 +25,7 @@ struct get_impacted_account_visitor
       op.get_required_owner_authorities( _impacted );
    }
 
-   // ops
+   // 定义原因？？？
    void operator()( const commit_paper_operation& op )
    {
       _impacted.insert( op.author );
@@ -35,7 +35,7 @@ struct get_impacted_account_visitor
    {
       _impacted.insert( op.author );
    }
-
+//-------------------------------------
    
    void operator()( const account_create_operation& op )
    {

@@ -2910,8 +2910,9 @@ void claim_reward_balance_evaluator::do_apply( const claim_reward_balance_operat
 
    _db.adjust_proxied_witness_votes( acnt, op.reward_vests.amount );
 }
-
+//-------------------group_signature----------------------------
 void commit_paper_evaluator::do_apply( const commit_paper_operation& o ){
+   //创建paper_object,并将其写入数据库中
     try{
        const auto& by_content_idx = _db.get_index< comment_index >().indices().get< by_permlink >();
        auto itr = by_content_idx.find ( boost::make_tuple( o.author, o.content ) );
@@ -2937,6 +2938,7 @@ void commit_paper_evaluator::do_apply( const commit_paper_operation& o ){
 }
 
 void apply_open_evaluator::do_apply( const apply_paper_operation& o ){
+   //修改对应的paper的作者的信息
    try{
       const auto& by_content_idx = _db.get_index< comment_index >().indices().get< by_permlink >();
       auto itr = by_content_idx.find( o.author );
@@ -2948,7 +2950,7 @@ void apply_open_evaluator::do_apply( const apply_paper_operation& o ){
    }
    FC_CAPTURE_AND_RETHROW( (O) )
 }
-
+//----------------------------------------------------------------------------------------
 #ifdef STEEM_ENABLE_SMT
 void claim_reward_balance2_evaluator::do_apply( const claim_reward_balance2_operation& op )
 {

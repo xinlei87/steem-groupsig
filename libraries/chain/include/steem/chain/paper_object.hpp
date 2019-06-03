@@ -55,6 +55,7 @@ namespace steem { namespace chain {
             id_type           id;
             
             account_name_type author;
+            //重新定义
             signature_type    sign;
             shared_string     permlink;
 

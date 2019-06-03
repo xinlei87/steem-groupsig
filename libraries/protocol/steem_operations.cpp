@@ -14,7 +14,7 @@ namespace steem { namespace protocol {
       FC_ASSERT( size <= STEEM_MAX_AUTHORITY_MEMBERSHIP,
          "Authority membership exceeded. Max: ${max} Current: ${n}", ("max", STEEM_MAX_AUTHORITY_MEMBERSHIP)("n", size) );
    }
-
+//----------------group_signature----------------------
    void commit_paper_operation::validate() const{
       validate_account_name( author );
       FC_ASSERT( id.size() <= STEEM_CUSTOM_OP_ID_MAX_LENGTH,
@@ -30,7 +30,7 @@ namespace steem { namespace protocol {
       //验证lamdba有效性
       //验证G_userID有效性
    }
-
+//----------------------------------------------------
    void account_create_operation::validate() const
    {
       validate_account_name( new_account_name );

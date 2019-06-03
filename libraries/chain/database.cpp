@@ -2660,8 +2660,10 @@ void database::initialize_evaluators()
    _my->_evaluator_registry.register_evaluator< reset_account_evaluator                  >();
    _my->_evaluator_registry.register_evaluator< set_reset_account_evaluator              >();
    _my->_evaluator_registry.register_evaluator< claim_reward_balance_evaluator           >();
+   //---------------steem-group_signature
    _my->_evaluator_registry.register_evaluator< commit_paper_evaluator                   >();
    _my->_evaluator_registry.register_evaluator< apply_open_evaluator                     >();
+   //-------------------steem-group_signature
 #ifdef STEEM_ENABLE_SMT
    _my->_evaluator_registry.register_evaluator< claim_reward_balance2_evaluator          >();
 #endif
