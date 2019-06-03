@@ -1,3 +1,4 @@
+//增加paper_object和paper_content_object
 #pragma once
 #include <steem/chain/steem_fwd.hpp>
 
