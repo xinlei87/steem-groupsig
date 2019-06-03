@@ -15,6 +15,22 @@ namespace steem { namespace protocol {
          "Authority membership exceeded. Max: ${max} Current: ${n}", ("max", STEEM_MAX_AUTHORITY_MEMBERSHIP)("n", size) );
    }
 
+   void commit_paper_operation::validate() const{
+      validate_account_name( author );
+      FC_ASSERT( id.size() <= STEEM_CUSTOM_OP_ID_MAX_LENGTH,
+         "Operation ID length exceeded. Max: ${max} Current: ${n}", ("max", STEEM_CUSTOM_OP_ID_MAX_LENGTH)("n", id.size()) );
+      validate_permlink( content );
+      //验证签名有效性
+   }
+
+   void apply_open_operation::validate() const{
+      validate_account_name( author );
+      FC_ASSERT( id.size() <= STEEM_CUSTOM_OP_ID_MAX_LENGTH,
+         "Operation ID length exceeded. Max: ${max} Current: ${n}", ("max", STEEM_CUSTOM_OP_DATA_MAX_LENGTH)("n", id.size()) );
+      //验证lamdba有效性
+      //验证G_userID有效性
+   }
+
    void account_create_operation::validate() const
    {
       validate_account_name( new_account_name );

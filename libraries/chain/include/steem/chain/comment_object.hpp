@@ -64,7 +64,7 @@ namespace steem { namespace chain {
          account_name_type parent_author;
          shared_string     parent_permlink;
          account_name_type author;
-         shared_string     permlink;
+         shared_string     permlink;//原文链接
 
          time_point_sec    last_update;
          time_point_sec    created;

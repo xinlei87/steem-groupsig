@@ -2911,6 +2911,44 @@ void claim_reward_balance_evaluator::do_apply( const claim_reward_balance_operat
    _db.adjust_proxied_witness_votes( acnt, op.reward_vests.amount );
 }
 
+void commit_paper_evaluator::do_apply( const commit_paper_operation& o ){
+    try{
+       const auto& by_content_idx = _db.get_index< comment_index >().indices().get< by_permlink >();
+       auto itr = by_content_idx.find ( boost::make_tuple( o.author, o.content ) );
+
+       const auto& auth = _db.get_account( o.author );
+
+       FC_ASSERT( itr != by_content_idx.end(), "The paper must be exists.");
+
+       const auto& paper = *itr;
+
+       #ifdef IS_LOW_MEM
+         _db.modify( _db.get< comment_content_object, by_comment >( comment.id ), [&]( comment_content_object& con )
+         {
+            con.type = "claimed";
+         });
+
+         _db.modify( comment, [&]( comment_object& c ){
+            c.author = o.author;
+         });
+      #endif
+    }
+    FC_CAPTURE_AND_RETHROW( (O) )
+}
+
+void apply_open_evaluator::do_apply( const apply_paper_operation& o ){
+   try{
+      const auto& by_content_idx = _db.get_index< comment_index >().indices().get< by_permlink >();
+      auto itr = by_content_idx.find( o.author );
+
+      const auto& auth = _db.get_account( o.author );
+
+      FC_ASSERT( itr != by_content_idx.end(), "The author must be exists.");
+
+   }
+   FC_CAPTURE_AND_RETHROW( (O) )
+}
+
 #ifdef STEEM_ENABLE_SMT
 void claim_reward_balance2_evaluator::do_apply( const claim_reward_balance2_operation& op )
 {

@@ -11,6 +11,32 @@ namespace steem { namespace protocol {
 
    void validate_auth_size( const authority& a );
 
+   struct commit_paper_operation : public base_operation
+   {
+      custom_id_type    id;
+      account_name_type author;
+      string            content;
+      signature_type    sign;
+
+      extensions_type   extensions;
+
+      void validate()const;
+      void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(author); }
+   };
+
+   struct apply_open_operation : public base_operation
+   {
+      custom_id_type    id;
+      account_name_type author;
+      char              lambda;
+      char              G_userID;
+
+      extensions_type   extensions;
+
+      void validate()const;
+      void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(author); }
+   };
+
    struct account_create_operation : public base_operation
    {
       asset             fee;
@@ -1076,7 +1102,8 @@ namespace steem { namespace protocol {
    };
 } } // steem::protocol
 
-
+FC_REFLECT( steem::protocol::commit_paper_operation, (id)(author)(content)(sign)(extensions) )
+FC_REFLECT( steem::protocol::apply_open_operation, (id)(author)(lambda)(G_userID)(extensions) )
 FC_REFLECT( steem::protocol::transfer_to_savings_operation, (from)(to)(amount)(memo) )
 FC_REFLECT( steem::protocol::transfer_from_savings_operation, (from)(request_id)(to)(amount)(memo) )
 FC_REFLECT( steem::protocol::cancel_transfer_from_savings_operation, (from)(request_id) )

@@ -17,6 +17,7 @@ struct get_impacted_account_visitor
    typedef void result_type;
 
    template<typename T>
+
    void operator()( const T& op )
    {
       op.get_required_posting_authorities( _impacted );
@@ -25,6 +26,17 @@ struct get_impacted_account_visitor
    }
 
    // ops
+   void operator()( const commit_paper_operation& op )
+   {
+      _impacted.insert( op.author );
+   }
+
+   void operator()( const apply_open_operation& op )
+   {
+      _impacted.insert( op.author );
+   }
+
+   
    void operator()( const account_create_operation& op )
    {
       _impacted.insert( op.new_account_name );

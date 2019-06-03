@@ -52,6 +52,8 @@ struct by_name;
 
 enum object_type
 {
+   paper_object_type,
+   paper_content_object_type,
    dynamic_global_property_object_type,
    account_object_type,
    account_metadata_object_type,
@@ -108,6 +110,8 @@ class witness_schedule_object;
 class comment_object;
 class comment_content_object;
 class comment_vote_object;
+class paper_object;
+class paper_content_object;
 class witness_vote_object;
 class limit_order_object;
 class feed_history_object;
@@ -151,7 +155,9 @@ typedef oid< transaction_object                     > transaction_object_id_type
 typedef oid< block_summary_object                   > block_summary_id_type;
 typedef oid< witness_schedule_object                > witness_schedule_id_type;
 typedef oid< comment_object                         > comment_id_type;
+typedef oid< paper_object                           > paper_id_type;
 typedef oid< comment_content_object                 > comment_content_id_type;
+typedef oid< paper_content_object                   > paper_content_id_type;
 typedef oid< comment_vote_object                    > comment_vote_id_type;
 typedef oid< witness_vote_object                    > witness_vote_id_type;
 typedef oid< limit_order_object                     > limit_order_id_type;
@@ -351,6 +357,8 @@ T unpack_from_vector( const steem::chain::buffer_type& s )
 } } // namespace fc::raw
 
 FC_REFLECT_ENUM( steem::chain::object_type,
+                 (paper_object_type)
+                 (paper_content_object_type)
                  (dynamic_global_property_object_type)
                  (account_object_type)
                  (account_metadata_object_type)
