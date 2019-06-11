@@ -82,6 +82,7 @@ namespace steem {
       typedef uint32_t                    contribution_id_type;
       typedef fixed_string<32>            custom_id_type;
 
+      typedef fc::ecc::group_signature_user user_signature_type;
 
       struct public_key_type
       {

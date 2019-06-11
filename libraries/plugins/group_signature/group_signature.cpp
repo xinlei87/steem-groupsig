@@ -18,12 +18,7 @@ namespace detail {
     
     group_signature_plugin_impl::~group_signature_plugin_impl()
     {
-        if(gsk!=NULL){
-            delete gsk;
-        }
-        element_clear(vk);
-        element_clear(GID);
-        delete mpk;
+        
     }
     
     void group_signature_plugin_impl:: L(element_t I, element_t *l)
@@ -96,7 +91,12 @@ namespace detail {
 
         element_random(s);
         element_random(t);
-
+        //测试，先固定s，t
+        const char sstr[] = "346122343231638985077046426490987973974719772237";
+        element_set_str(s,sstr,10);
+        const char tstr[] = "77583513436316961525400618262687645185192876454";
+        element_set_str(t,tstr,10);
+        
         ZR_ELEMENT_ARRAY(F, K, pairing);
         ZR_ELEMENT_ARRAY(G, K, pairing);
 
@@ -127,6 +127,7 @@ namespace detail {
 
     void group_signature_plugin_impl::GrpSetup(element_t alpha, element_t r1)
     {
+
         element_pow_zn(gsk->a2, mpk->u2, r1);
         element_pow_zn(gsk->a3, mpk->u3, r1);
         element_pow_zn(gsk->a4, mpk->u4, r1);
@@ -203,6 +204,148 @@ namespace detail {
         pairing_apply(ok->ok1, e1e, gsk->a0, pairing);
         pairing_apply(ok->ok2, gsk->a5, e2e, pairing);
     }
+    //验证
+    bool group_signature_plugin_impl::Verify(element_t m, signaturetype *sig)
+    {
+        element_t d1, d2, q, t, M, temp1, temp2;
+        element_init_G1(d1, pairing);
+        element_init_G2(d2, pairing);
+        element_init_GT(q, pairing);
+        element_init_Zr(t, pairing);
+        element_random(t);
+        element_init_GT(M, pairing);
+        element_random(M);
+        element_pow_zn(d1, mpk->g, t);
+        element_init_G2(temp1, pairing);
+        element_init_G2(temp2, pairing);
+        element_pow_zn(temp1, mpk->u1, GID);
+        element_pow_zn(temp2, mpk->u3, m);
+        element_mul(temp1, mpk->u0, temp1);
+        element_mul(temp1, temp1, temp2);
+        element_mul(temp1, temp1, sig->c6);
+        element_pow_zn(d2, temp1, t);
+
+        element_clear(temp1);
+        element_init_GT(temp1, pairing);
+        pairing_apply(temp1, mpk->h1, mpk->g2, pairing);
+        element_pow_zn(temp1, temp1, t);
+        element_mul(q, M, temp1);
+
+        element_clear(temp1);
+        element_clear(temp2);
+        element_init_GT(temp1, pairing);
+
+        element_init_GT(temp2, pairing);
+        pairing_apply(temp1, sig->c5, d2, pairing);
+
+        pairing_apply(temp2, d1, sig->c0, pairing);
+        element_div(temp1, temp1, temp2);
+        element_mul(temp1, q, temp1);
+        return element_cmp(M, temp1) == 0 && VerifyPOK(sig) ? true : false;
+    }
+    bool group_signature_plugin_impl::VerifyPOK(signaturetype *sig)
+    {
+        // printf("this is verifypok\n");
+        element_t temp1, temp2, temp3, negc, r1Pr, r2Pr, r3Pr, r4Pr, f, g3;
+        element_init_G2(temp1, pairing);
+        element_init_G2(temp2, pairing);
+        element_init_G2(temp3, pairing);
+        element_init_Zr(negc, pairing);
+        element_init_G2(f, pairing);
+        element_init_GT(g3, pairing);
+        element_init_G2(r1Pr, pairing);
+        element_init_G2(r2Pr, pairing);
+        element_init_G2(r3Pr, pairing);
+        element_init_GT(r4Pr, pairing);
+
+        element_pow_zn(temp1, mpk->u2, sig->p->s1);
+        element_pow_zn(temp2, mpk->u4, sig->p->s2);
+        element_neg(negc, sig->p->c);
+        element_pow_zn(temp3, sig->c6, negc);
+
+        element_mul(temp1, temp1, temp2);
+        element_mul(r1Pr, temp1, temp3);
+
+        element_clear(temp1);
+        element_clear(temp2);
+        element_init_G1(temp1, pairing);
+        element_init_G1(temp2, pairing);
+        element_pow_zn(temp1, sig->e1, negc);
+        element_pow_zn(temp2, mpk->g, sig->p->s3);
+        element_mul(r2Pr, temp2, temp1);
+
+        element_clear(temp1);
+        element_init_G2(temp1, pairing);
+        element_pow_zn(temp1, mpk->u1, GID);
+        element_mul(f, mpk->u0, temp1);
+        element_pow_zn(temp1, f, sig->p->s3);
+        element_init_G2(temp2, pairing);
+        element_pow_zn(temp2, sig->e2, negc);
+        element_mul(r3Pr, temp1, temp2);
+
+        element_clear(temp1);
+        element_clear(temp2);
+        element_clear(temp3);
+        element_init_GT(temp1, pairing);
+        element_init_GT(temp2, pairing);
+        element_init_GT(temp3, pairing);
+
+        element_pow_zn(temp1, mpk->n, sig->p->s1);
+        pairing_apply(g3, mpk->h1, mpk->g2, pairing);
+        element_pow_zn(temp2, g3, sig->p->s3);
+        element_pow_zn(temp3, sig->e3, negc);
+        element_mul(temp1, temp1, temp2);
+        element_mul(r4Pr, temp1, temp3);
+
+        char a[2500] = {'\0'};
+        char b[520];
+        element_snprintf(b, 500, "%B", r1Pr);
+        // printf("%zd\n",strlen(b));
+        strcat(a, b);
+        element_snprintf(b, 500, "%B", r2Pr);
+        // printf("%zd\n",strlen(b));
+        
+        strcat(a, b);
+        element_snprintf(b, 500, "%B", r3Pr);
+        // printf("%zd\n",strlen(b));
+
+        strcat(a, b);
+        element_snprintf(b, 500, "%B", r4Pr);
+        // printf("%zd\n",strlen(b));
+
+        strcat(a, b);
+
+        element_clear(temp1);
+        element_init_Zr(temp1, pairing);
+        element_from_hash(temp1, a, 1500);
+        bool re = element_cmp(temp1, sig->p->c) == 0 ? true : false;
+        element_clear(temp1);
+        element_clear(temp2);
+        element_clear(temp3);
+        element_clear(negc);
+        element_clear(r1Pr);
+        element_clear(r2Pr);
+        element_clear(r3Pr);
+        element_clear(r4Pr);
+        element_clear(f);
+        element_clear(g3);
+        return re;
+    }
+    bool group_signature_plugin_impl::open(char * userID, const char * lameda,element_t e)
+    {
+        ZR_ELEMENT(UID,pairing);
+        element_from_hash(UID,(void*)userID,(int)strlen(userID));
+        GT_ELEMENT(temp, pairing);
+        element_pow_zn(temp, mpk->n, UID);
+        GT_ELEMENT(la, pairing);
+        element_set_str(la,lameda,10);
+        element_mul(temp, temp, la);
+        bool re = element_cmp(e,temp) == 0? true: false;
+        element_clear(UID);
+        element_clear(temp);
+        element_clear(la);
+        return re;
+    }
 }
 
 
@@ -213,7 +356,6 @@ void group_signature_plugin::plugin_initialize(const appbase::variables_map& opt
 {//初始化公钥
     
     my = std::make_unique< detail::group_signature_plugin_impl >();
-    printf("this is initialize\n");
 
     char params[] = {"type a\n\
 q 8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791\n\
@@ -244,9 +386,10 @@ sign0 1\n"};
     element_set_str(my->mpk->u3, u3str, 10);
     element_set_str(my->mpk->u4, u4str, 10);
     element_set_str(my->mpk->n, nstr, 10);
-    element_init_Zr(my->GID, my->pairing);
-    element_from_hash(my->GID, (void *)"computer", 10);
 
+    element_init_Zr(my->GID, my->pairing);
+    std::string grpID = "computer";
+    element_from_hash(my->GID, (void *)grpID.c_str(), 8);
     my->gsk = new gsktype(my->pairing);
 
     element_init_G1(my->vk, my->pairing);
@@ -254,6 +397,8 @@ sign0 1\n"};
 
 void group_signature_plugin::plugin_startup()
 {
+    ilog( "group_signature: plugin_startup() begin" );
+
     G1_ELEMENT_ARRAY(Ei, my->K, my->pairing);
 
     G1_ELEMENT_ARRAY(si, my->N, my->pairing);
@@ -275,7 +420,6 @@ void group_signature_plugin::plugin_startup()
         element_add(alpha_i, alpha_i,si[i]);
         element_add(ri, ri, ti[i]);
     }
-
 //计算g^alpha,并进行广播
 
     G1_ELEMENT_ARRAY(g_alpha_i, my->N, my->pairing);
@@ -330,10 +474,17 @@ void group_signature_plugin::plugin_startup()
 
     element_clear(alpha_i);
     element_clear(ri);
-
+    ilog("group_signature:plugin_start():end");
 }
 
 void group_signature_plugin::plugin_shutdown()
-{}
+{
+    if(my->gsk!=NULL){
+            delete my->gsk;
+        }
+        element_clear(my->vk);
+        element_clear(my->GID);
+        delete my->mpk;
+}
 
 } } }

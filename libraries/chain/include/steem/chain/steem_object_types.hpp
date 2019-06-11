@@ -27,7 +27,7 @@ namespace protocol {
 
 struct asset;
 struct price;
-
+struct group_signature_data;
 }
 
 namespace chain {
@@ -145,6 +145,10 @@ class smt_token_emissions_object;
 
 class proposal_object;
 class proposal_vote_object;
+//-----------------------
+class paper_object;
+class paper_content_object;
+//----------------------------
 
 typedef oid< dynamic_global_property_object         > dynamic_global_property_id_type;
 typedef oid< account_object                         > account_id_type;
@@ -154,10 +158,10 @@ typedef oid< witness_object                         > witness_id_type;
 typedef oid< transaction_object                     > transaction_object_id_type;
 typedef oid< block_summary_object                   > block_summary_id_type;
 typedef oid< witness_schedule_object                > witness_schedule_id_type;
+
+
 typedef oid< comment_object                         > comment_id_type;
-typedef oid< paper_object                           > paper_id_type;
 typedef oid< comment_content_object                 > comment_content_id_type;
-typedef oid< paper_content_object                   > paper_content_id_type;
 typedef oid< comment_vote_object                    > comment_vote_id_type;
 typedef oid< witness_vote_object                    > witness_vote_id_type;
 typedef oid< limit_order_object                     > limit_order_id_type;
@@ -192,7 +196,10 @@ typedef oid< smt_token_emissions_object             > smt_token_emissions_object
 
 typedef oid< proposal_object > proposal_id_type;
 typedef oid< proposal_vote_object > proposal_vote_id_type;
-
+//------------------------------------------------------------
+typedef oid< paper_object                           > paper_id_type;
+typedef oid< paper_content_object                   > paper_content_id_type;
+//----------------------------------------
 enum bandwidth_type
 {
    post,    ///< Rate limiting posting reward eligibility over time

@@ -151,7 +151,7 @@ namespace fc { namespace ecc {
     {
         my->_key = dat;
     }
-
+    
     public_key::public_key( const compact_signature& c, const fc::sha256& digest, canonical_signature_type canon_type )
     {
         int nV = c.data[0];

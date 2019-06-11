@@ -11,7 +11,6 @@
 #include <steem/chain/util/manabar.hpp>
 
 #include <fc/macros.hpp>
-
 #ifndef IS_LOW_MEM
 FC_TODO( "After we vendor fc, also vendor diff_match_patch and fix these warnings" )
 #pragma GCC diagnostic push
@@ -2910,51 +2909,93 @@ void claim_reward_balance_evaluator::do_apply( const claim_reward_balance_operat
 
    _db.adjust_proxied_witness_votes( acnt, op.reward_vests.amount );
 }
-<<<<<<< HEAD
 //-------------------group_signature----------------------------
 void commit_paper_evaluator::do_apply( const commit_paper_operation& o ){
+   
+   //检查签名
+   const steem::plugins::group_signature::group_signature_plugin& _gpp =  appbase::app().get_plugin<steem::plugins::group_signature::group_signature_plugin>();
+   steem::plugins::group_signature::signaturetype sig(_gpp.my->pairing);
+   element_set_str(sig.c0, o.c0.c_str(), 10);
+   element_set_str(sig.c5, o.c5.c_str(), 10);
+   element_set_str(sig.c6, o.c6.c_str(), 10);
+   element_set_str(sig.e1,o.e1.c_str(), 10);
+   element_set_str(sig.e2, o.e2.c_str(), 10);
+   element_set_str(sig.e3, o.e3.c_str(), 10);
+   element_set_str(sig.p->c, o.c.c_str(), 10);
+   element_set_str(sig.p->s1, o.s1.c_str(), 10);
+   element_set_str(sig.p->s2, o.s2.c_str(), 10);
+   element_set_str(sig.p->s3, o.s3.c_str(), 10);
+   element_t m;
+   element_init_Zr(m, _gpp.my->pairing);
+   element_from_hash(m,(void *)o.title.c_str(),(int)o.title.length());
+
+   FC_ASSERT(_gpp.my->Verify(m,&sig), "Group signature is invalid");
    //创建paper_object,并将其写入数据库中
-    try{
-       const auto& by_content_idx = _db.get_index< comment_index >().indices().get< by_permlink >();
-       auto itr = by_content_idx.find ( boost::make_tuple( o.author, o.content ) );
 
-       const auto& auth = _db.get_account( o.author );
+   FC_ASSERT( o.title.size() + o.body.size(), "Cannot update comment because nothing appears to be changing." );
+//使用by_permlink方法索引,需提供author 和permlink
+   const auto& by_permlink_idx = _db.get_index< paper_index >().indices().get< by_permlink >();
+   auto itr = by_permlink_idx.find( boost::make_tuple( o.author, o.permlink ) );
+   auto now = _db.head_block_time();
+   if ( itr == by_permlink_idx.end() )
+   {
+      const auto& new_paper = _db.create< paper_object >( [&]( paper_object& pap )
+      {
+         pap.created = now;
+         pap.account = o.account;
+         pap.author = o.author;
+         from_string( pap.permlink, o.permlink );
+         //写入签名
+         element_to_bytes(pap.signature.c0.begin(), sig.c0);
+         element_to_bytes(pap.signature.c5.begin(), sig.c5);      
+         element_to_bytes(pap.signature.c6.begin(), sig.c6);      
+         element_to_bytes(pap.signature.e1.begin(), sig.e1);
+         element_to_bytes(pap.signature.e2.begin(), sig.e2);
+         element_to_bytes(pap.signature.e3.begin(), sig.e3);      
+         element_to_bytes(pap.signature.c.begin(), sig.p->c);
+         element_to_bytes(pap.signature.s1.begin(), sig.p->s1);
+         element_to_bytes(pap.signature.s2.begin(), sig.p->s2);
+         element_to_bytes(pap.signature.s3.begin(), sig.p->s3);      
+      });
 
-       FC_ASSERT( itr != by_content_idx.end(), "The paper must be exists.");
-
-       const auto& paper = *itr;
-
-       #ifdef IS_LOW_MEM
-         _db.modify( _db.get< comment_content_object, by_comment >( comment.id ), [&]( comment_content_object& con )
-         {
-            con.type = "claimed";
-         });
-
-         _db.modify( comment, [&]( comment_object& c ){
-            c.author = o.author;
-         });
-      #endif
-    }
-    FC_CAPTURE_AND_RETHROW( (O) )
-}
-
-void apply_open_evaluator::do_apply( const apply_paper_operation& o ){
-   //修改对应的paper的作者的信息
-   try{
-      const auto& by_content_idx = _db.get_index< comment_index >().indices().get< by_permlink >();
-      auto itr = by_content_idx.find( o.author );
-
-      const auto& auth = _db.get_account( o.author );
-
-      FC_ASSERT( itr != by_content_idx.end(), "The author must be exists.");
+      _db.create< paper_content_object >( [&]( paper_content_object& con )
+      {
+         con.paper = new_paper.id;
+         from_string( con.title, o.title );
+         from_string( con.body, o.body );
+      });
 
    }
-   FC_CAPTURE_AND_RETHROW( (O) )
+   else{
+      FC_ASSERT(false, "This paper is already exist");
+   }
+
+}
+
+void apply_open_evaluator::do_apply( const apply_open_operation& o ){
+   //修改对应的paper的作者的信息
+   try{
+      const steem::plugins::group_signature::group_signature_plugin& _gpp =  appbase::app().get_plugin<steem::plugins::group_signature::group_signature_plugin>();
+      
+      const paper_object& paper = _db.get_paper(STEEM_ANONYMOUS_ACCOUNT,o.permlink);
+      
+      element_t e;
+      element_init_GT(e, _gpp.my->pairing);
+      element_from_bytes(e,(unsigned char  *)paper.signature.e3.begin());
+      string author_name = o.author;
+      FC_ASSERT(_gpp.my->open((char *)author_name.c_str(), o.lambda.c_str(), e),"this is not author's paper");
+      
+      _db.modify(paper,[&](paper_object& p){
+         p.last_update = _db.head_block_time();
+         p.author = o.author;
+
+      });
+      
+      element_clear(e);
+   }FC_CAPTURE_AND_RETHROW( (o) )
 }
 //----------------------------------------------------------------------------------------
-=======
 
->>>>>>> ad1bbc115244946d9a8882d3ff91832b6e4aa959
 #ifdef STEEM_ENABLE_SMT
 void claim_reward_balance2_evaluator::do_apply( const claim_reward_balance2_operation& op )
 {

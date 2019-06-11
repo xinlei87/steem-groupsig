@@ -30,6 +30,8 @@ namespace steem { namespace plugins { namespace rc {
 
 struct state_object_size_info
 {
+   int64_t paper_object_base_size             = 2048    *STATE_BYTES_SCALE;
+   int64_t paper_object_permlink_char_size    =         STATE_BYTES_SCALE;
    // authority
    int64_t authority_base_size                =   4    *STATE_BYTES_SCALE;
    int64_t authority_account_member_size      =  18    *STATE_BYTES_SCALE;
@@ -97,6 +99,8 @@ struct state_object_size_info
 
 struct operation_exec_info
 {
+   int64_t apply_open_operation_exec_time                      =  67000;
+   int64_t commit_paper_operation_exec_time                    =  89700;
    int64_t account_create_operation_exec_time                  =  57700;
    int64_t account_create_with_delegation_operation_exec_time  =  57700;
    int64_t account_update_operation_exec_time                  =  14000;
@@ -182,6 +186,9 @@ FC_REFLECT( steem::plugins::rc::state_object_size_info,
    ( proposal_object_base_size )
    ( proposal_vote_object_base_size )
    ( proposal_vote_object_member_size )
+//-------------------------------------------
+   ( paper_object_base_size )
+//------------------------------------
    )
 
 FC_REFLECT( steem::plugins::rc::operation_exec_info,
@@ -238,5 +245,8 @@ FC_REFLECT( steem::plugins::rc::operation_exec_info,
    (create_proposal_operation_exec_time)
    (update_proposal_votes_operation_exec_time)
    (remove_proposal_operation_exec_time)
-
+//-------------------------------------
+   (commit_paper_operation_exec_time)
+   (apply_open_operation_exec_time)
+//----------------------------------------
    )

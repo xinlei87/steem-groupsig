@@ -6,6 +6,7 @@
 #include <steem/chain/steem_object_types.hpp>
 
 #include <steem/protocol/asset.hpp>
+#include<steem/protocol/signature.hpp>
 
 namespace steem { namespace chain {
 

@@ -14,7 +14,7 @@
 
 #include <steem/protocol/protocol.hpp>
 #include <steem/protocol/hardfork.hpp>
-
+#include <steem/protocol/config.hpp>
 #include <appbase/plugin.hpp>
 
 #include <fc/signals.hpp>
@@ -187,7 +187,10 @@ namespace steem { namespace chain {
          /// Allows to process all operations held in blocks and transactions until processor returns true.
          void foreach_operation(std::function<bool(const signed_block_header&, const signed_block&,
             const signed_transaction&, uint32_t, const operation&, uint16_t)> processor) const;
-
+//----------------------
+         const paper_object& get_paper(const string& name, const shared_string& permlink) const;
+         const paper_object* find_paper(const string& name, const shared_string& permlink) const;
+//---------------------------
          const witness_object&  get_witness(  const account_name_type& name )const;
          const witness_object*  find_witness( const account_name_type& name )const;
 

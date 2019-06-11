@@ -125,12 +125,57 @@ public:
         delete ei;
     }
 };
+struct POK
+{
+    element_t c, s1, s2, s3;
+    POK(pairing_t pairing)
+    {
+        element_init_Zr(c, pairing);
+        element_init_Zr(s1, pairing);
+        element_init_Zr(s2, pairing);
+        element_init_Zr(s3, pairing);
+    }
+    ~POK()
+    {
+        element_clear(c);
+        element_clear(s1);
+        element_clear(s2);
+        element_clear(s3);
+    }
+};
+struct SIG
+{
+    element_t c0, c5, c6, e1, e2, e3;
+    struct POK *p;
+
+    SIG(pairing_t pairing)
+    {
+        element_init_G2(c0, pairing);
+        element_init_G1(c5, pairing);
+        element_init_G2(c6, pairing);
+        element_init_G1(e1, pairing);
+        element_init_G2(e2, pairing);
+        element_init_GT(e3, pairing);
+        p = new struct POK(pairing);
+    }
+    ~SIG()
+    {
+        element_clear(c0);
+        element_clear(c5);
+        element_clear(c6);
+        element_clear(e1);
+        element_clear(e2);
+        element_clear(e3);
+        free(p);
+    }
+};
 
 typedef MPK mpktype;
 typedef GSK gsktype;
 typedef USK usktype;
 typedef OK oktype;
 typedef SHARE sharetype;
+typedef struct SIG signaturetype;
 
 
 #define G1_ELEMENT(var, pairing) element_t var; element_init_G1(var, pairing);

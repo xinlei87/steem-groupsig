@@ -35,6 +35,10 @@ namespace detail {
         void GrpSetup(element_t alpha, element_t r1);
         void Extract_administrator(element_t UID, usktype *usk);
         void openkey(const char* e1, const char* e2, oktype *ok);
+        bool Verify(element_t m, signaturetype *sig);
+        bool VerifyPOK(signaturetype *sig);
+        bool open(char * userID, const char * lameda,element_t e);
+
 
     };
 

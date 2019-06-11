@@ -255,6 +255,9 @@ void webserver_plugin_impl::handle_http_message( websocket_server_type* server, 
       {
          con->set_body( api->call( body ) );
          con->append_header( "Content-Type", "application/json" );
+         con->append_header( "Access-Control-Allow-Origin", "*" );
+         con->append_header( "Access-Control-Allow-Methods", "GET, POST, OPTIONS" );
+         con->append_header( "Access-Control-Allow-Headers", "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range" );
          con->set_status( websocketpp::http::status_code::ok );
       }
       catch( fc::exception& e )

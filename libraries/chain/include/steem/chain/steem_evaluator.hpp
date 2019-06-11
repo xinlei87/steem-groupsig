@@ -1,7 +1,8 @@
 #pragma once
 
 #include <steem/protocol/steem_operations.hpp>
-
+#include <steem/plugins/group_signature/group_signature.hpp>
+#include <steem/plugins/group_signature/group_signature_plugin.hpp>
 #include <steem/chain/evaluator.hpp>
 
 namespace steem { namespace chain {

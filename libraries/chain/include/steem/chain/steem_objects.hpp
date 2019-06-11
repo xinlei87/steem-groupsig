@@ -481,6 +481,7 @@ template<> struct is_static_length< steem::chain::reward_fund_object > : public 
 
 #include <steem/chain/comment_object.hpp>
 #include <steem/chain/account_object.hpp>
+#include <steem/chain/paper_object.hpp>
 
 FC_REFLECT( steem::chain::limit_order_object,
              (id)(created)(expiration)(seller)(orderid)(for_sale)(sell_price) )

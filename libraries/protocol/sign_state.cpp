@@ -6,6 +6,7 @@ namespace steem { namespace protocol {
 bool sign_state::signed_by( const public_key_type& k )
 {
    auto itr = provided_signatures.find(k);
+   
    if( itr == provided_signatures.end() )
    {
       auto pk = available_keys.find(k);
@@ -18,6 +19,7 @@ bool sign_state::signed_by( const public_key_type& k )
 
 bool sign_state::check_authority( string id )
 {
+
    if( approved_by.find(id) != approved_by.end() ) return true;
    uint32_t account_auth_count = 1;
    return check_authority_impl( get_active(id), 0, &account_auth_count );
@@ -37,13 +39,16 @@ bool sign_state::check_authority_impl( const authority& auth, uint32_t depth, ui
       if( signed_by( k.first ) )
       {
          total_weight += k.second;
-         if( total_weight >= auth.weight_threshold )
+         if( total_weight >= auth.weight_threshold ){
             return true;
+         }
+         
       }
 
       membership++;
       if( max_membership > 0 && membership >= max_membership )
       {
+
          return false;
       }
    }
@@ -57,6 +62,7 @@ bool sign_state::check_authority_impl( const authority& auth, uint32_t depth, ui
 
          if( max_account_auths > 0 && *account_auth_count >= max_account_auths )
          {
+
             return false;
          }
 
@@ -66,15 +72,18 @@ bool sign_state::check_authority_impl( const authority& auth, uint32_t depth, ui
          {
             approved_by.insert( a.first );
             total_weight += a.second;
-            if( total_weight >= auth.weight_threshold )
-               return true;
+            if( total_weight >= auth.weight_threshold ){
+
+               return true;}
          }
       }
       else
       {
          total_weight += a.second;
-         if( total_weight >= auth.weight_threshold )
+         if( total_weight >= auth.weight_threshold ){
             return true;
+
+         }
       }
 
       membership++;
@@ -83,6 +92,7 @@ bool sign_state::check_authority_impl( const authority& auth, uint32_t depth, ui
          return false;
       }
    }
+
    return total_weight >= auth.weight_threshold;
 }
 
@@ -104,8 +114,21 @@ sign_state::sign_state(
    const flat_set<public_key_type>& keys
    ) : get_active(a), available_keys(keys)
 {
-   for( const auto& key : sigs )
+   for( const auto& key : sigs ){
       provided_signatures[ key ] = false;
+      // std::string sigtemp;
+      // const char hex_chars[] = "0123456789ABCDEF";
+      // unsigned int c = 0;
+      // for(int i = 0; i< (int)key.key_data.size(); i++){
+      //    unsigned int x = 0;
+      //    x = key.key_data.data[i];
+      //    x = x >> 4;
+      //    c = x & 0x0f;
+      //    sigtemp += hex_chars[c];
+      //    sigtemp += hex_chars[key.key_data.data[i] & 0x0f];
+      // }
+      // std::cout<<"\n\nsignature is "<<sigtemp<<"\n\n";
+   }
    approved_by.insert( "temp"  );
 }
 

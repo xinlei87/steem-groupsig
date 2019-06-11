@@ -46,14 +46,16 @@ void verify_authority( const vector<AuthContainerType>& auth_containers, const f
       s.max_account_auths = max_account_auths;
       for( auto& id : posting_approvals )
          s.approved_by.insert( id );
+//交易签名验证   6.6
       for( const auto& id : required_posting )
       {
+
          STEEM_ASSERT( s.check_authority(id) ||
                           s.check_authority(get_active(id)) ||
                           s.check_authority(get_owner(id)),
                           tx_missing_posting_auth, "Missing Posting Authority ${id}",
                           ("id",id)
-                          ("posting",get_posting(id))
+                          ("posting2",get_posting(id))
                           ("active",get_active(id))
                           ("owner",get_owner(id)) );
       }

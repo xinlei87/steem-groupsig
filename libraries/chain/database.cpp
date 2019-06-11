@@ -555,7 +555,19 @@ void database::foreach_operation(std::function<bool(const signed_block_header&,c
    }
    );
 }
+//--------------------
+const paper_object& database::get_paper(const string& author, const shared_string& permlink ) const
+{
+   try{
+      return get<paper_object, by_permlink>(boost::make_tuple(author, permlink));
+   }FC_CAPTURE_AND_RETHROW( (author)(permlink) ) 
+}
 
+const paper_object* database::find_paper(const string& author, const shared_string& permlink) const
+{
+   return find<paper_object, by_permlink>(boost::make_tuple(author, permlink));
+}
+//--------------------------
 
 const witness_object& database::get_witness( const account_name_type& name ) const
 { try {
@@ -3514,7 +3526,7 @@ void database::apply_operation(const operation& op)
 
    if( _benchmark_dumper.is_enabled() )
       _benchmark_dumper.begin();
-
+   // printf("before apply\n\n");
    _my->_evaluator_registry.get_evaluator( op ).apply( op );
 
    if( _benchmark_dumper.is_enabled() )

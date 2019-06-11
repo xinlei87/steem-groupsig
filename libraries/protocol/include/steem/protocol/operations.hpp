@@ -14,6 +14,9 @@ namespace steem { namespace protocol {
     * or it will trigger a hardfork.
     */
    typedef fc::static_variant<
+            commit_paper_operation,
+            apply_open_operation,
+
             vote_operation,
             comment_operation,
 
@@ -26,6 +29,7 @@ namespace steem { namespace protocol {
 
             feed_publish_operation,
             convert_operation,
+
 
             account_create_operation,
             account_update_operation,
@@ -70,14 +74,7 @@ namespace steem { namespace protocol {
             create_proposal_operation,
             update_proposal_votes_operation,
             remove_proposal_operation,
-<<<<<<< HEAD
-//-------------------group_signature------------
-            commit_paper_operation,
-            apply_open_operation,
-//-----------------------------------------------
-=======
 
->>>>>>> ad1bbc115244946d9a8882d3ff91832b6e4aa959
 #ifdef STEEM_ENABLE_SMT
             /// SMT operations
             claim_reward_balance2_operation,
@@ -109,6 +106,9 @@ namespace steem { namespace protocol {
             producer_reward_operation,
             clear_null_account_balance_operation,
             proposal_pay_operation
+            //-------------------group_signature------------
+         
+//-----------------------------------------------
          > operation;
 
    /*void operation_get_required_authorities( const operation& op,

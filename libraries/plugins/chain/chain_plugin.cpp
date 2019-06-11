@@ -643,7 +643,7 @@ bool chain_plugin::accept_block( const steem::chain::signed_block& block, bool c
    cxt.prom_ptr = &prom;
 
    my->write_queue.push( &cxt );
-
+//-------6.4-----------------
    prom.get_future().get();
 
    if( cxt.except ) throw *(cxt.except);
@@ -657,12 +657,11 @@ void chain_plugin::accept_transaction( const steem::chain::signed_transaction& t
    write_context cxt;
    cxt.req_ptr = &trx;
    cxt.prom_ptr = &prom;
-
    my->write_queue.push( &cxt );
-
+   
    prom.get_future().get();
 
-   if( cxt.except ) throw *(cxt.except);
+   if( cxt.except ) throw *(cxt.except);//抛出异常？？？？
 
    return;
 }

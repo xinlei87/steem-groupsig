@@ -27,7 +27,8 @@ namespace fc {
     typedef fc::array<char,78>          extended_key_data;
     typedef fc::sha256                  blinded_hash;
     typedef fc::sha256                  blind_signature;
-
+    typedef fc::array<unsigned char,128> group_signature_user;
+    
     enum canonical_signature_type
     {
       non_canonical,

@@ -48,6 +48,8 @@ void initialize_core_indexes( database& db )
    STEEM_ADD_CORE_INDEX(db, vesting_delegation_expiration_index);
    STEEM_ADD_CORE_INDEX(db, pending_required_action_index);
    STEEM_ADD_CORE_INDEX(db, pending_optional_action_index);
+   STEEM_ADD_CORE_INDEX(db, paper_index);
+   STEEM_ADD_CORE_INDEX(db, paper_content_index);
 #ifdef STEEM_ENABLE_SMT
    STEEM_ADD_CORE_INDEX(db, smt_token_index);
    STEEM_ADD_CORE_INDEX(db, smt_event_token_index);

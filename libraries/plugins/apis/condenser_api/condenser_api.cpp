@@ -298,6 +298,7 @@ namespace detail
                         case operation::tag<pow_operation>::value:
                         case operation::tag<custom_operation>::value:
                         case operation::tag<producer_reward_operation>::value:
+                  
                         default:
                            if( item.second.op.visit( visitor ) )
                            {
@@ -1735,7 +1736,6 @@ namespace detail
             FC_LOG_MESSAGE( warn, "Unknown error occured when pushing transaction" ),
             std::current_exception() );
       }
-
       return p.get_future().get();
    }
 

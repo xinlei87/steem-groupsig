@@ -10,37 +10,7 @@
 
 
 namespace steem { namespace chain {
-
-    using protocol::beneficiary_route_type;
-    using chainbase::t_vector;
-    using chainbase::t_pair;
-
-    struct strcmp_less
-    {
-        bool operator()( const shared_string& a, const shared_string& b )const
-        {
-            return less( a.c_str(), b.c_str() );
-        }
-
-#ifndef ENABLE_MIRA
-        bool operator()( const shared_string& a, const string& b )const
-        {
-            return less( a.c_str(), b.c_str() );
-        }
-
-        bool operator()( const string& a, const shared_string& b )const
-        {
-            return less( a.c_str(), b.c_str() );
-        }
-#endif
-
-        private:
-            inline bool less( const char* a, const char* b )const
-            {
-                return std::strcmp( a, b ) < 0;
-            }
-    };
-
+    using steem::protocol::signature_data;
     class paper_object : public object < paper_object_type, paper_object >
     {
         STEEM_STD_ALLOCATOR_CONSTRUCTOR( paper_object )
@@ -55,14 +25,13 @@ namespace steem { namespace chain {
 
             id_type           id;
             
-            account_name_type author;
-            //重新定义
-            signature_type    sign;
-            shared_string     permlink;
+            string            author;
+            account_name_type account;
 
-            time_point_sec    last_update;
+            signature_data    signature;
+            shared_string     permlink;
+            time_point_sec last_update;
             time_point_sec    created;
-            time_point_sec    active;       
     };
 
     class paper_content_object : public object< paper_content_object_type, paper_content_object >
@@ -94,27 +63,14 @@ namespace steem { namespace chain {
             ordered_unique< tag< by_id >, member< paper_object, paper_id_type, &paper_object::id> >,
             ordered_unique< tag< by_permlink >,
                 composite_key< paper_object,
-                    member< paper_object, account_name_type, &paper_object::author >,
+                    member< paper_object, string, &paper_object::author >,
                     member< paper_object, shared_string, &paper_object::permlink >
                 >,
                 composite_key_compare< std::less< account_name_type >, strcmp_less >
                 >
-            >
-            
-#ifndef IS_LOW_MEM
-        ,
-        ordered_unique< tag< by_last_update >,
-            composite_key< paper_object,
-                member< paper_object, account_name_type, &paper_object::author >,
-                member< paper_object, time_point_sec, &paper_object::last_update >,
-                member< paper_object, paper_id_type, &paper_object::id>
-            >,
-            composite_key_compare< std::less< account_name_type >, std::greater< time_point_sec >, std::less< paper_id_type > >
-        >
-#endif
-    >,
-    allocator< paper_object >
-> paper_index;
+        >,
+        allocator< paper_object >
+    > paper_index;
 
     struct by_paper;
 
@@ -124,14 +80,14 @@ namespace steem { namespace chain {
             ordered_unique< tag< by_id >, member< paper_content_object, paper_content_id_type, &paper_content_object::id > >,
             ordered_unique< tag< by_paper >, member< paper_content_object, paper_id_type, &paper_content_object::paper > >
         >,
-        allocator< paper_object >
+        allocator< paper_content_object >
     > paper_content_index;
 
 } } 
 
 FC_REFLECT( steem::chain::paper_object,
-             (id)(author)(sign)(permlink)
-             (last_update)(created)(active)
+             (id)(author)(account)(signature)(permlink)
+             (last_update)(created)
         )
 
 CHAINBASE_SET_INDEX_TYPE( steem::chain::paper_object, steem::chain::paper_index )

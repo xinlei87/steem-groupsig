@@ -91,13 +91,38 @@ flat_set<public_key_type> signed_transaction::get_signature_keys(const chain_id_
    {
       auto d = sig_digest(chain_id);
       flat_set<public_key_type> result;
+      // const char hex_chars[] = "0123456789ABCDEF";
       for (const auto &sig : signatures)
-      {
+      {  
+         // std::string sigtemp;
+         // unsigned int c = 0;
+         // for(int i = 0; i< (int)sig.size(); i++){
+         //    unsigned int x = 0;
+         //    x = sig.data[i];
+         //    x = x >> 4;
+         //    c = x & 0x0f;
+         //    sigtemp += hex_chars[c];
+         //    sigtemp += hex_chars[sig.data[i] & 0x0f];
+         // }
+         // std::cout<<"\n\nsignature is "<<sigtemp<<"\n\n"<<canon_type;
          STEEM_ASSERT(
              result.insert(fc::ecc::public_key(sig, d, canon_type)).second,
              tx_duplicate_sig,
              "Duplicate Signature detected");
       }
+      // for (const auto & re : result){
+      //    std::string sigtemp;
+      //    unsigned int c = 0;
+      //    for(int i = 0; i< (int)re.key_data.size(); i++){
+      //       unsigned int x = 0;
+      //       x = re.key_data.data[i];
+      //       x = x >> 4;
+      //       c = x & 0x0f;
+      //       sigtemp += hex_chars[c];
+      //       sigtemp += hex_chars[re.key_data.data[i] & 0x0f];
+      //    }
+      //    std::cout<<"\n\nresult is "<<sigtemp<<"\n\n";
+      // }
       return result;
    }
    FC_CAPTURE_AND_RETHROW()

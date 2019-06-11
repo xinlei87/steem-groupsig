@@ -1110,7 +1110,7 @@ namespace chainbase {
              auto obj = find< ObjectType, IndexedByType >( std::forward< CompatibleKey >( key ) );
              if( !obj )
              {
-                BOOST_THROW_EXCEPTION( std::out_of_range( "unknown key" ) );
+                BOOST_THROW_EXCEPTION( std::out_of_range( "unknown key111" ) );
              }
              return *obj;
          }

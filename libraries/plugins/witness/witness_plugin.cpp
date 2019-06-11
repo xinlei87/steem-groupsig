@@ -198,7 +198,8 @@ namespace detail {
                "Comment is nested ${x} posts deep, maximum depth is ${y}.", ("x",parent->depth)("y",STEEM_SOFT_MAX_COMMENT_DEPTH) );
          }
       }
-
+      void operator()(const commit_paper_operation& o)const{}
+      
       void operator()( const transfer_operation& o )const
       {
          if( o.memo.length() > 0 )

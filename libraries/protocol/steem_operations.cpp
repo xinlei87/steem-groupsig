@@ -1,5 +1,6 @@
 #include <steem/protocol/steem_operations.hpp>
 
+#include<steem/protocol/config.hpp>
 #include <fc/macros.hpp>
 #include <fc/io/json.hpp>
 #include <fc/macros.hpp>
@@ -14,27 +15,28 @@ namespace steem { namespace protocol {
       FC_ASSERT( size <= STEEM_MAX_AUTHORITY_MEMBERSHIP,
          "Authority membership exceeded. Max: ${max} Current: ${n}", ("max", STEEM_MAX_AUTHORITY_MEMBERSHIP)("n", size) );
    }
-<<<<<<< HEAD
 //----------------group_signature----------------------
    void commit_paper_operation::validate() const{
-      validate_account_name( author );
-      FC_ASSERT( id.size() <= STEEM_CUSTOM_OP_ID_MAX_LENGTH,
-         "Operation ID length exceeded. Max: ${max} Current: ${n}", ("max", STEEM_CUSTOM_OP_ID_MAX_LENGTH)("n", id.size()) );
-      validate_permlink( content );
-      //验证签名有效性
+      validate_account_name( account );
+
+      FC_ASSERT( title.size() < STEEM_COMMENT_TITLE_LIMIT,
+         "Title size limit exceeded. Max: ${max} Current: ${n}", ("max", STEEM_COMMENT_TITLE_LIMIT - 1)("n", title.size()) );
+      FC_ASSERT( fc::is_utf8( title ), "Title not formatted in UTF8" );
+      FC_ASSERT( body.size() > 0, "Body is empty" );
+      FC_ASSERT( fc::is_utf8( body ), "Body not formatted in UTF8" );
+
+      validate_permlink( permlink );
+
    }
 
    void apply_open_operation::validate() const{
-      validate_account_name( author );
-      FC_ASSERT( id.size() <= STEEM_CUSTOM_OP_ID_MAX_LENGTH,
-         "Operation ID length exceeded. Max: ${max} Current: ${n}", ("max", STEEM_CUSTOM_OP_DATA_MAX_LENGTH)("n", id.size()) );
+      validate_account_name( account );
       //验证lamdba有效性
+      
       //验证G_userID有效性
    }
 //----------------------------------------------------
-=======
 
->>>>>>> ad1bbc115244946d9a8882d3ff91832b6e4aa959
    void account_create_operation::validate() const
    {
       validate_account_name( new_account_name );

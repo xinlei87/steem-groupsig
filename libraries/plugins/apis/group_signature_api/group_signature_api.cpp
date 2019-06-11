@@ -42,8 +42,7 @@ namespace steem { namespace plugins { namespace group_signature {
             {
                 extract_return key;
                 ZR_ELEMENT(UID,_gp.my->pairing);
-                const char *u = args.userID.c_str();
-                element_from_hash(UID,(void*)u,10);
+                element_from_hash(UID,(char *)args.userID.c_str(),(int)args.userID.length());
                 usktype usk(_gp.my->pairing);
                 _gp.my->Extract_administrator(UID,&usk);
                 char temp1[400] = {'\0'};
@@ -58,6 +57,7 @@ namespace steem { namespace plugins { namespace group_signature {
                 char temp4[400] ={'\0'};
                 element_snprintf(temp4,320,"%B", usk.b5);
                 key.b5 = temp4;
+                element_clear(UID);
                 return key;
             }
         };

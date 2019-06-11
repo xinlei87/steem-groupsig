@@ -1506,7 +1506,7 @@ struct convert_from_legacy_operation_visitor
    {
       return operation( create_proposal_operation( op ) );
    }
-
+   
    template< typename T >
    operation operator()( const T& t )const
    {

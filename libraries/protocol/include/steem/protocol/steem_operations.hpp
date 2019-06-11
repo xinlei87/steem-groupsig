@@ -4,42 +4,64 @@
 #include <steem/protocol/asset.hpp>
 #include <steem/protocol/validation.hpp>
 #include <steem/protocol/legacy_asset.hpp>
-
+#include <steem/protocol/signature.hpp>
 #include <fc/crypto/equihash.hpp>
 
 namespace steem { namespace protocol {
 
    void validate_auth_size( const authority& a );
-<<<<<<< HEAD
 //-----------group_signature
+   // class group_signature_string{
+   //    public:
+   //    string c0,c5,c6,e1,e2,e3,c,s1,s2,s3;
+   //    group_signature_string(){}
+
+   // };
    struct commit_paper_operation : public base_operation
    {
-      account_name_type author;
-      string            content;
-          signature;
+      account_name_type account;
+      string            author;
+      string            permlink;
 
-      extensions_type   extensions;
+      string            title;
+      string            body;
+      string            json_metadata;
+
+      string            c0;
+      string            c5;
+      string            c6;
+      string            e1;
+      string            e2;
+      string            e3;
+      string            c;
+      string            s1;
+      string            s2;
+      string            s3;
+
+      // group_signature_string   signature;
+
+      // extensions_type   extensions;
 
       void validate()const;
-      void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(author); }
+      // void get_required_active_authorities( flat_set< account_name_type >& a ) const { a.insert( account ); }
+
+      void get_required_posting_authorities( flat_set<account_name_type>& a )const{ a.insert(account); }
    };
 
    struct apply_open_operation : public base_operation
    {
-      custom_id_type    id;
-      account_name_type author;
-      char              lambda;
-      char              G_userID;
-
-      extensions_type   extensions;
+      account_name_type account;
+      string            author;
+      string            lambda;
+      string            permlink;
+      // extensions_type   extensions;
+      string            json_metadata;
 
       void validate()const;
-      void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(author); }
+      void get_required_posting_authorities( flat_set<account_name_type>& a )const{ a.insert(account); }
    };
 //----------------------------------------------------------------------------
-=======
 
->>>>>>> ad1bbc115244946d9a8882d3ff91832b6e4aa959
    struct account_create_operation : public base_operation
    {
       asset             fee;
@@ -52,6 +74,7 @@ namespace steem { namespace protocol {
       string            json_metadata;
 
       void validate()const;
+      
       void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(creator); }
    };
 
@@ -1105,13 +1128,12 @@ namespace steem { namespace protocol {
    };
 } } // steem::protocol
 
-<<<<<<< HEAD
-FC_REFLECT( steem::protocol::commit_paper_operation, (id)(author)(content)(sign)(extensions) )
-FC_REFLECT( steem::protocol::apply_open_operation, (id)(author)(lambda)(G_userID)(extensions) )
-
-
-=======
->>>>>>> ad1bbc115244946d9a8882d3ff91832b6e4aa959
+FC_REFLECT( steem::protocol::commit_paper_operation, (account)(author)(permlink)(title)(body)(json_metadata)
+// (signature)
+(c0)(c5)(c6)(e1)(e2)(e3)(c)(s1)(s2)(s3)
+)
+FC_REFLECT( steem::protocol::apply_open_operation, (account)(author)(lambda)(permlink)(json_metadata) )
+// FC_REFLECT(steem::protocol::group_signature_string, (c0)(c5)(c6)(e1)(e2)(e3)(c)(s1)(s2)(s3))
 FC_REFLECT( steem::protocol::transfer_to_savings_operation, (from)(to)(amount)(memo) )
 FC_REFLECT( steem::protocol::transfer_from_savings_operation, (from)(request_id)(to)(amount)(memo) )
 FC_REFLECT( steem::protocol::cancel_transfer_from_savings_operation, (from)(request_id) )
