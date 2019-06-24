@@ -260,7 +260,9 @@ endif()
 # fc/src/compress/miniz.c breaks strict aliasing. The Linux kernel builds with no strict aliasing
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing -Werror -DBOOST_THREAD_DONT_PROVIDE_PROMISE_LAZY" )
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing -Werror -DBOOST_THREAD_DONT_PROVIDE_PROMISE_LAZY" )
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 # external_plugins needs to be compiled first because libraries/app depends on STEEM_EXTERNAL_PLUGINS being fully populated
 add_subdirectory( external_plugins )
 add_subdirectory( libraries )
@@ -291,6 +293,7 @@ set(CPACK_PACKAGE_DESCRIPTION "A client for the Steem network")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A client for the Steem network")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "Steem ${CPACK_PACKAGE_VERSION}")
+
 
 if(WIN32)
  SET(CPACK_GENERATOR "ZIP;NSIS")
