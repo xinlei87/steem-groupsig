@@ -1,7 +1,10 @@
 #pragma once
 #include <steem/chain/steem_fwd.hpp>
+#include <steem/plugins/group_signature/group_signature_plugin.hpp>
+#include <steem/plugins/group_signature/group_signature.hpp>
 #include <steem/plugins/chain/chain_plugin.hpp>
 
+#include <steem/plugins/p2p/p2p_plugin.hpp>
 #include <appbase/application.hpp>
 
 #define STEEM_P2P_PLUGIN_NAME "p2p"
@@ -13,7 +16,11 @@ namespace detail { class p2p_plugin_impl; }
 
 class p2p_plugin : public appbase::plugin<p2p_plugin> {
 public:
-   APPBASE_PLUGIN_REQUIRES((plugins::chain::chain_plugin))
+   APPBASE_PLUGIN_REQUIRES(
+      (steem::plugins::group_signature::group_signature_plugin)
+
+      (steem::plugins::chain::chain_plugin)
+      )
 
    p2p_plugin();
    virtual ~p2p_plugin();
@@ -30,7 +37,6 @@ public:
    void broadcast_block( const steem::protocol::signed_block& block );
    void broadcast_transaction( const steem::protocol::signed_transaction& tx );
    void set_block_production( bool producing_blocks );
-
 private:
    std::unique_ptr< detail::p2p_plugin_impl > my;
 };

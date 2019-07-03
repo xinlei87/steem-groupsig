@@ -77,7 +77,7 @@ class p2p_plugin_impl : public graphene::net::node_delegate
 {
 public:
 
-   p2p_plugin_impl( plugins::chain::chain_plugin& c )
+   p2p_plugin_impl( plugins::chain::chain_plugin& c)
       : running(true), activeHandleBlock(false), activeHandleTx(false), chain( c )
    {
       handleBlockFinished.second = std::shared_future<void>(handleBlockFinished.first.get_future());
@@ -125,6 +125,9 @@ public:
    plugins::chain::chain_plugin& chain;
 
    fc::thread p2p_thread;
+//-----------group-signature----------------
+   uint16_t group_number = 0;
+//------------------------------------------
 
 private:
    class shutdown_helper final
@@ -200,7 +203,6 @@ bool p2p_plugin_impl::handle_block( const graphene::net::block_message& blk_msg,
          // when the net code sees that, it will stop trying to push blocks from that chain, but
          // leave that peer connected so that they can get sync blocks from us
          bool result = chain.accept_block( blk_msg.block, sync_mode, ( block_producer | force_validate ) ? chain::database::skip_nothing : chain::database::skip_transaction_signatures );
-
          if( !sync_mode )
          {
             fc::microseconds offset = fc::time_point::now() - blk_msg.block.timestamp;
@@ -563,6 +565,8 @@ void p2p_plugin::set_program_options( bpo::options_description& cli, bpo::option
       ("seed-node", bpo::value<vector<string>>()->composing(), "The IP address and port of a remote peer to sync with. Deprecated in favor of p2p-seed-node.")
       ("p2p-seed-node", bpo::value<vector<string>>()->composing()->default_value( default_seeds, seed_ss.str() ), "The IP address and port of a remote peer to sync with.")
       ("p2p-parameters", bpo::value<string>(), ("P2P network parameters. (Default: " + fc::json::to_string(graphene::net::node_configuration()) + " )").c_str() )
+//------------group-signature------------------
+      ("group-number",bpo::value<uint16_t>(),"number of node in group")
       ;
    cli.add_options()
       ("force-validate", bpo::bool_switch()->default_value(false), "Force validation of all transactions. Deprecated in favor of p2p-force-validate" )
@@ -636,13 +640,21 @@ void p2p_plugin::plugin_initialize(const boost::program_options::variables_map& 
       fc::variant var = fc::json::from_string( options.at("p2p-parameters").as<string>(), fc::json::strict_parser );
       my->config = var.get_object();
    }
+//--------------group-signature-----------------
+   if( options.count("group-number") )
+   {
+      my->group_number = options.at("group-number").as< uint16_t >();
+   }
+//-----------------------------------------
+   std::cout<<"group-number "<<my->group_number<<"\n\n";
+
 }
 
 void p2p_plugin::plugin_startup()
 {
    my->p2p_thread.async( [this]
    {
-      my->node.reset(new graphene::net::node(my->user_agent));
+      my->node.reset(new graphene::net::node(my->user_agent,my->group_number));
       my->node->load_configuration(app().data_dir() / "p2p");
       my->node->set_node_delegate( &(*my) );
 
@@ -657,8 +669,8 @@ void p2p_plugin::plugin_startup()
          try
          {
             ilog("P2P adding seed node ${s}", ("s", seed));
-            my->node->add_node(seed);
-            my->node->connect_to_endpoint(seed);
+            my->node->add_node(seed);//将seed-node加入潜在连接节点
+            my->node->connect_to_endpoint(seed);//handshaking+最终的链接
          }
          catch( graphene::net::already_connected_to_requested_peer& )
          {
@@ -673,10 +685,11 @@ void p2p_plugin::plugin_startup()
 
          my->config.set( "maximum_number_of_connections", fc::variant( my->max_connections ) );
       }
-
-      my->node->set_advanced_node_parameters( my->config );
-      my->node->listen_to_p2p_network();
-      my->node->connect_to_p2p_network();
+//p2p插件的工作过程
+      my->node->set_advanced_node_parameters( my->config );//本节点的参数设置
+      my->node->listen_to_p2p_network();//监听端口
+      my->node->connect_to_p2p_network();//节点建立连接，同步信息（区块信息，交易信息，时间信息，自己掌握的地址列表），维护p2p网络
+      // ilog("connect_to_p2p_network is done\n");
       block_id_type block_id;
       my->chain.db().with_read_lock( [&]()
       {
@@ -757,15 +770,17 @@ void p2p_plugin::plugin_shutdown() {
 
 void p2p_plugin::broadcast_block( const steem::protocol::signed_block& block )
 {
-   ulog("Broadcasting block #${n}", ("n", block.block_num()));
+   ilog("Broadcasting block #${n}", ("n", block.block_num()));
    my->node->broadcast( graphene::net::block_message( block ) );
 }
 
 void p2p_plugin::broadcast_transaction( const steem::protocol::signed_transaction& tx )
 {
-   ulog("Broadcasting tx #${n}", ("id", tx.id()));
+   //广播交易
+   ilog("Broadcasting tx #${n}", ("id", tx.id()));
    my->node->broadcast( graphene::net::trx_message( tx ) );
 }
+
 
 void p2p_plugin::set_block_production( bool producing_blocks )
 {

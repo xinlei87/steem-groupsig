@@ -35,7 +35,8 @@
 #include <fc/variant_object.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/io/enum_type.hpp>
-
+#include<string>
+#include<iostream>
 
 #include <vector>
 
@@ -63,7 +64,7 @@ namespace graphene { namespace net {
                item_hash == other.item_hash;
       }
   };
-
+//消息类型
   enum core_message_type_enum
   {
     trx_message_type                             = 1000,
@@ -86,11 +87,39 @@ namespace graphene { namespace net {
     check_firewall_reply_message_type            = 5015,
     get_current_connections_request_message_type = 5016,
     get_current_connections_reply_message_type   = 5017,
+    //------------group-signature----------------------------
+    vss_message_type                             = 5018,
+    vk_message_type                              = 5019,
+//-------------------------------------------------------
     core_message_type_last                       = 5099
+
   };
 
   const uint32_t core_protocol_version = GRAPHENE_NET_PROTOCOL_VERSION;
+//--------------group-signature----------------------
 
+  struct vss_message
+  {
+    static const core_message_type_enum type;
+    std::string si;
+    std::string ti;
+    std::vector<std::string> Ei;
+    uint16_t number;
+    vss_message(){}
+    vss_message(std::string s, std::string t, std::vector<std::string>Ei,uint16_t number):
+    si(s),ti(t),Ei(Ei),number(number)
+    {}
+  };
+  struct vk_message
+  {
+    static const core_message_type_enum type;
+    std::string vk;
+    uint16_t number;
+    vk_message(){}
+    vk_message(std::string vk, uint16_t number):
+    vk(vk), number(number)
+    {}
+  };
    struct trx_message
    {
       static const core_message_type_enum type;
@@ -199,7 +228,9 @@ namespace graphene { namespace net {
     node_id_t                  node_public_key;
     fc::ecc::compact_signature signed_shared_secret;
     fc::variant_object         user_data;
-
+//--------group-signature-------------------
+    uint16_t                   group_number;
+//--------------------------------------------
     hello_message() {}
     hello_message(const std::string& user_agent,
                   uint32_t core_protocol_version,
@@ -208,7 +239,8 @@ namespace graphene { namespace net {
                   uint16_t outbound_port,
                   const node_id_t& node_public_key,
                   const fc::ecc::compact_signature& signed_shared_secret,
-                  const fc::variant_object& user_data ) :
+                  const fc::variant_object& user_data,
+                  uint16_t group_number ) :
       user_agent(user_agent),
       core_protocol_version(core_protocol_version),
       inbound_address(inbound_address),
@@ -216,7 +248,8 @@ namespace graphene { namespace net {
       outbound_port(outbound_port),
       node_public_key(node_public_key),
       signed_shared_secret(signed_shared_secret),
-      user_data(user_data)
+      user_data(user_data),
+      group_number(group_number)
     {}
   };
 
@@ -421,7 +454,10 @@ FC_REFLECT_ENUM( graphene::net::core_message_type_enum,
                  (check_firewall_reply_message_type)
                  (get_current_connections_request_message_type)
                  (get_current_connections_reply_message_type)
-                 (core_message_type_last) )
+//------------------group-signature---------------
+                 (vss_message_type)
+                 (vk_message_type)
+                 (core_message_type_last))
 
 FC_REFLECT( graphene::net::trx_message, (trx) )
 FC_REFLECT( graphene::net::block_message, (block)(block_id) )
@@ -445,7 +481,10 @@ FC_REFLECT( graphene::net::hello_message, (user_agent)
                                      (outbound_port)
                                      (node_public_key)
                                      (signed_shared_secret)
-                                     (user_data) )
+                                     (user_data) 
+                                    //  ----------group-signature
+                                      (group_number)
+                                     )
 
 FC_REFLECT_EMPTY( graphene::net::connection_accepted_message )
 FC_REFLECT_ENUM(graphene::net::rejection_reason_code, (unspecified)
@@ -504,7 +543,10 @@ FC_REFLECT(graphene::net::get_current_connections_reply_message, (upload_rate_on
                                                             (upload_rate_one_hour)
                                                             (download_rate_one_hour)
                                                             (current_connections))
-
+//----------------group-signature--------------------------------
+FC_REFLECT(graphene::net::vss_message,(si)(ti)(Ei)(number))
+FC_REFLECT(graphene::net::vk_message,(vk)(number))
+//-----------------------------------
 #include <unordered_map>
 #include <fc/crypto/city.hpp>
 #include <fc/crypto/sha224.hpp>

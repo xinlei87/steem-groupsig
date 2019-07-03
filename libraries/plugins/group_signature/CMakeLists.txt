@@ -6,7 +6,7 @@ add_library( group_signature_plugin
              ${HEADERS}
            )
 #需添加编译参数-lpbc -lgmp
-target_link_libraries( group_signature_plugin p2p_plugin chain_plugin rc_plugin appbase steem_chain steem_utilities steem_utilities -lpbc -lgmp )
+target_link_libraries( group_signature_plugin chain_plugin rc_plugin appbase steem_chain steem_utilities steem_utilities -lpbc -lgmp )
 
 target_include_directories( group_signature_plugin PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 

@@ -15,7 +15,7 @@
 #include <steem/plugins/p2p/p2p_plugin.hpp>
 #include <steem/plugins/webserver/webserver_plugin.hpp>
 #include <steem/plugins/witness/witness_plugin.hpp>
-
+#include<steem/plugins/group_signature/group_signature_plugin.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/thread/thread.hpp>
 #include <fc/interprocess/signals.hpp>
@@ -88,13 +88,14 @@ int main( int argc, char** argv )
          steem::plugins::witness::witness_plugin,
          steem::plugins::account_by_key::account_by_key_plugin,
          steem::plugins::account_by_key::account_by_key_api_plugin,
-         steem::plugins::condenser_api::condenser_api_plugin >();
+         steem::plugins::condenser_api::condenser_api_plugin>();
 
       // These plugins are loaded regardless of the config
       bool initialized = appbase::app().initialize<
             steem::plugins::chain::chain_plugin,
-            steem::plugins::p2p::p2p_plugin,
-            steem::plugins::webserver::webserver_plugin >
+            steem::plugins::group_signature::group_signature_plugin,
+            steem::plugins::p2p::p2p_plugin, 
+            steem::plugins::webserver::webserver_plugin>
             ( argc, argv );
 
       info();

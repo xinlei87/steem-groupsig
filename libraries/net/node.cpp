@@ -448,6 +448,10 @@ namespace graphene { namespace net {
       // @{
       fc::promise<void>::ptr        _retrigger_advertise_inventory_loop_promise;
       fc::future<void>              _advertise_inventory_loop_done;
+//--------------group-signature------------------------------------------
+      fc::promise<void>::ptr         _retrigger_broadcast_vk_message_loop_promise;
+      fc::future<void>              _broadcast_vk_message_loop_done;
+//--------------------------------------------------
       std::unordered_set<item_id>   _new_inventory; /// list of items we have received but not yet advertised to our peers
       // @}
 
@@ -459,6 +463,9 @@ namespace graphene { namespace net {
        * node_config.json.  It doesn't really have much of a purpose yet, there was just some thought
        * that we might someday have a use for nodes having a private key (sent in hello messages)
        */
+      //--------------------group-signature----------------
+      uint16_t                _group_number;
+//----------------------------------
       node_id_t            _node_public_key;
       /**
        * _node_id is a random number generated each time the client is launched, used to prevent us
@@ -510,7 +517,6 @@ namespace graphene { namespace net {
       fc::future<void> _bandwidth_monitor_loop_done;
 
       fc::future<void> _dump_node_status_task_done;
-
       /* We have two alternate paths through the schedule_peer_for_deletion code -- one that
        * uses a mutex to prevent one fiber from adding items to the queue while another is deleting
        * items from it, and one that doesn't.  The one that doesn't is simpler and more efficient
@@ -538,7 +544,7 @@ namespace graphene { namespace net {
       std::atomic_int        _activeCalls;
       fc::promise<void>::ptr _shutdownNotifier;
 
-      node_impl(const std::string& user_agent);
+      node_impl(const std::string& user_agent, const uint16_t group_number);
       virtual ~node_impl();
 
       void save_node_configuration();
@@ -555,7 +561,10 @@ namespace graphene { namespace net {
       bool is_item_in_any_peers_inventory(const item_id& item) const;
       void fetch_items_loop();
       void trigger_fetch_items_loop();
-
+//---------------grop-signature-----------------
+      void broadcast_vk_message_loop();
+      void trigger_broadcast_vk_message_loop();
+//-----------------------------------------------
       void advertise_inventory_loop();
       void trigger_advertise_inventory_loop();
 
@@ -586,7 +595,14 @@ namespace graphene { namespace net {
 
       void on_hello_message( peer_connection* originating_peer,
                              const hello_message& hello_message_received );
+//---------group-signature------------------
+      void on_vss_message( peer_connection* originating_peer,
+                            const vss_message& vss_message_received);
+      void send_vss_message(const peer_connection_ptr& peer);
 
+      void on_vk_message(peer_connection* originating_peer,
+                          const vk_message& vk_message_received);
+//---------------------------------------------------
       void on_connection_accepted_message( peer_connection* originating_peer,
                                            const connection_accepted_message& connection_accepted_message_received );
 
@@ -802,7 +818,7 @@ namespace graphene { namespace net {
 #endif // P2P_IN_DEDICATED_THREAD
     }
 
-    node_impl::node_impl(const std::string& user_agent) :
+    node_impl::node_impl(const std::string& user_agent, const uint16_t group_number) :
 #ifdef P2P_IN_DEDICATED_THREAD
       _thread(std::make_shared<fc::thread>("p2p")),
 #endif // P2P_IN_DEDICATED_THREAD
@@ -815,6 +831,7 @@ namespace graphene { namespace net {
       _items_to_fetch_sequence_counter(0),
       _recent_block_interval_in_seconds(STEEM_BLOCK_INTERVAL),
       _user_agent_string(user_agent),
+      _group_number(group_number),
       _most_recent_blocks_accepted(GRAPHENE_NET_DEFAULT_MAX_CONNECTIONS),
       _total_number_of_unfetched_items(0),
       _rate_limiter(0, 0),
@@ -1256,7 +1273,29 @@ namespace graphene { namespace net {
       if( _retrigger_fetch_item_loop_promise )
         _retrigger_fetch_item_loop_promise->set_value();
     }
-
+//-------------group-signature-------------------
+    void node_impl::broadcast_vk_message_loop()
+    {
+      const steem::plugins::group_signature::group_signature_plugin& pp = appbase::app().get_plugin<steem::plugins::group_signature::group_signature_plugin>();
+      if(pp.my->vk_string != ""){
+        //广播vk
+        std::cout<<"broadcast vk\n\n";
+        broadcast(vk_message(pp.my->vk_string, _group_number));
+      }
+      if(!_node_is_shutting_down&&!_broadcast_vk_message_loop_done.canceled())
+      {
+        _broadcast_vk_message_loop_done = schedule_task( [this](){broadcast_vk_message_loop();},
+                                                        fc::time_point::now() + fc::minutes(GRAPHENE_NET_BROADCAST_VK_MESSAGE_INTERVAL_MINUTES),
+                                                        "broadcast vk message loop");
+      }
+    }
+    void node_impl::trigger_broadcast_vk_message_loop()
+    {
+      VERIFY_CORRECT_THREAD();
+      if( _retrigger_broadcast_vk_message_loop_promise )
+        _retrigger_broadcast_vk_message_loop_promise->set_value();
+    }
+//广播循环，对所有连接节点，广播相同的东西
     void node_impl::advertise_inventory_loop()
     {
       while (!_advertise_inventory_loop_done.canceled())
@@ -1323,7 +1362,7 @@ namespace graphene { namespace net {
         }
       } // while(!canceled)
     }
-
+//触发广播循环
     void node_impl::trigger_advertise_inventory_loop()
     {
       VERIFY_CORRECT_THREAD();
@@ -1533,7 +1572,7 @@ namespace graphene { namespace net {
                                                                    fc::time_point::now() + fc::seconds(1),
                                                                    "terminate_inactive_connections_loop" );
     }
-
+//更新自己的节点列表
     void node_impl::fetch_updated_peer_lists_loop()
     {
       std::list<peer_connection_ptr> original_active_peers(_active_connections.begin(), _active_connections.end());
@@ -1749,7 +1788,7 @@ namespace graphene { namespace net {
           if (address.last_seen_time > updated_peer_record.last_seen_time)
             new_information_received = true;
           updated_peer_record.last_seen_time = std::max(address.last_seen_time, updated_peer_record.last_seen_time);
-          _potential_peer_db.update_entry(updated_peer_record);
+          _potential_peer_db.update_entry(updated_peer_record);//加入_potential_peer_set
         }
       }
       return new_information_received;
@@ -1779,11 +1818,11 @@ namespace graphene { namespace net {
              ("direction", handshaking_connection->direction));
       }
     }
-
+//判断消息类型
     void node_impl::on_message( peer_connection* originating_peer, const message& received_message )
     {
-      VERIFY_CORRECT_THREAD();
 
+      VERIFY_CORRECT_THREAD();
       activity_tracer aTracer(__FUNCTION__, *this);
 
       message_hash_type message_hash = received_message.id();
@@ -1794,6 +1833,11 @@ namespace graphene { namespace net {
            ("endpoint", originating_peer->get_remote_endpoint()));
       switch ( received_message.msg_type )
       {
+      case core_message_type_enum::vk_message_type:
+        on_vk_message(originating_peer, received_message.as<vk_message>());
+      case core_message_type_enum::vss_message_type:
+        on_vss_message(originating_peer, received_message.as<vss_message>());
+        break;
       case core_message_type_enum::hello_message_type:
         on_hello_message(originating_peer, received_message.as<hello_message>());
         break;
@@ -1918,11 +1962,51 @@ namespace graphene { namespace net {
       if (user_data.contains("chain_id"))
         originating_peer->chain_id = user_data["chain_id"].as<steem::protocol::chain_id_type>();
     }
-
+//--------------------group-signature-----------------
+    void node_impl::on_vss_message(peer_connection* originating_peer, const vss_message& vss_message_received)
+    {
+      VERIFY_CORRECT_THREAD();
+      ilog("received a vss message from ${peer}",("peer",originating_peer->get_remote_endpoint()));
+      uint16_t n = vss_message_received.number -1;
+      std::cout<<"receive a vss message "<<vss_message_received.si<<" "<<vss_message_received.ti<<" "<<vss_message_received.number<<"\n\n";
+      //存放share
+      steem::plugins::group_signature::group_signature_plugin& pp = appbase::app().get_plugin<steem::plugins::group_signature::group_signature_plugin>();
+      if(pp.my->si_string_received[n] == "" ){
+        if(pp.my->VerifyShare(vss_message_received.si, vss_message_received.ti, vss_message_received.Ei))
+        {
+          pp.my->si_string_received[n] = vss_message_received.si;
+          pp.my->ti_string_received[n] = vss_message_received.ti;
+          pp.my->mpkGen();
+          trigger_broadcast_vk_message_loop();
+        }
+        else{
+          std::cout<<"vss message is invalid\n\n";
+        }
+      }
+      else{
+        std::cout<<"vss mesage is already received\n\n";
+      }
+      return;
+    }
+    void node_impl::on_vk_message(peer_connection* originating_peer, const vk_message& vk_message_received)
+    {
+      VERIFY_CORRECT_THREAD();
+      // ilog("received a vk message from ${peer}",("peer",originating_peer->get_remote_endpoint()));
+      uint16_t n = vk_message_received.number -1;
+      std::cout<<"received a vk message\n\n";
+      steem::plugins::group_signature::group_signature_plugin& pp = appbase::app().get_plugin<steem::plugins::group_signature::group_signature_plugin>();
+      if(pp.my->g_alpha_i_string_received[n] == ""){
+        std::cout<<"ok\n\n";
+        pp.my->g_alpha_i_string_received[n] = vk_message_received.vk;
+        pp.my->g_alphaGen();
+      }
+    }
+//解析收到的hellomessage
     void node_impl::on_hello_message( peer_connection* originating_peer, const hello_message& hello_message_received )
     {
       VERIFY_CORRECT_THREAD();
       // this already_connected check must come before we fill in peer data below
+      printf("received a hello_message\n\n\n");
       node_id_t peer_node_id = hello_message_received.node_public_key;
       try
       {
@@ -1948,7 +2032,9 @@ namespace graphene { namespace net {
       originating_peer->inbound_address = hello_message_received.inbound_address;
       originating_peer->inbound_port = hello_message_received.inbound_port;
       originating_peer->outbound_port = hello_message_received.outbound_port;
-
+//-------group-signature------------------------------
+      originating_peer->group_number = hello_message_received.group_number;
+//------------------------------------------------
       parse_hello_user_data_for_peer(originating_peer, hello_message_received.user_data);
 
       // if they didn't provide a last known fork, try to guess it
@@ -2133,6 +2219,7 @@ namespace graphene { namespace net {
         disconnect_from_peer(originating_peer, "Received a unexpected hello_message");
       }
     }
+//--------------group-signature----------------------
 
     void node_impl::on_connection_accepted_message(peer_connection* originating_peer, const connection_accepted_message& connection_accepted_message_received)
     {
@@ -2219,7 +2306,7 @@ namespace graphene { namespace net {
       }
       originating_peer->send_message(reply);
     }
-
+//收到地址消息后，链接节点，将节点加入active队列
     void node_impl::on_address_message(peer_connection* originating_peer, const address_message& address_message_received)
     {
       VERIFY_CORRECT_THREAD();
@@ -3445,7 +3532,6 @@ namespace graphene { namespace net {
                                                            const message_hash_type& message_hash )
     {
       fc::time_point message_receive_time = fc::time_point::now();
-
       dlog( "received a block from peer ${endpoint}, passing it to client", ("endpoint", originating_peer->get_remote_endpoint() ) );
       std::set<peer_connection_ptr> peers_to_disconnect;
       std::string disconnect_reason;
@@ -3604,6 +3690,7 @@ namespace graphene { namespace net {
                                           const message& message_to_process,
                                           const message_hash_type& message_hash)
     {
+      // printf("received a block\n\n");
       VERIFY_CORRECT_THREAD();
 
       // find out whether we requested this item while we were synchronizing or during normal operation
@@ -4213,6 +4300,7 @@ namespace graphene { namespace net {
         wlog( "Exception thrown while terminating Advertise inventory loop, ignoring" );
       }
 
+      
 
       // Next, terminate our existing connections.  First, close all of the connections nicely.
       // This will close the sockets and may result in calls to our "on_connection_closing"
@@ -4336,6 +4424,21 @@ namespace graphene { namespace net {
       {
         wlog( "Exception thrown while terminating Dump node status task, ignoring" );
       }
+//---------------------group-signature----------------------------------
+      try
+      {
+        _broadcast_vk_message_loop_done.cancel_and_wait("node_impl::close()");
+      }
+      catch ( const fc::exception& e )
+      {
+        wlog( "Exception thrown while terminating Dump node status task, ignoring: ${e}", ("e", e) );
+      }
+      catch (...)
+      {
+        wlog( "Exception thrown while terminating Dump node status task, ignoring" );
+      }
+
+      
     } // node_impl::close()
 
     void node_impl::accept_connection_task( peer_connection_ptr new_peer )
@@ -4377,6 +4480,7 @@ namespace graphene { namespace net {
     void node_impl::send_hello_message(const peer_connection_ptr& peer)
     {
       VERIFY_CORRECT_THREAD();
+      printf("this is send hello_message\n\n\n");
       peer->negotiation_status = peer_connection::connection_negotiation_status::hello_sent;
 
       fc::sha256::encoder shared_secret_encoder;
@@ -4411,11 +4515,33 @@ namespace graphene { namespace net {
                           local_endpoint.port(),
                           _node_public_key,
                           signature,
-                          generate_hello_user_data());
+                          generate_hello_user_data(),
+                          _group_number);
 
       peer->send_message(message(hello));
     }
-
+//------------group-signature-------------------
+    void node_impl::send_vss_message(const peer_connection_ptr& peer)
+    {
+      std::list<peer_connection_ptr> original_active_peers(_active_connections.begin(),_active_connections.end());
+      for( const peer_connection_ptr& active_peer: original_active_peers )
+      {
+        try
+        {
+          uint16_t n = active_peer->group_number;
+          steem::plugins::group_signature::group_signature_plugin& pp = appbase::app().get_plugin<steem::plugins::group_signature::group_signature_plugin>();
+          vss_message vss( pp.my->si_string[n-1], pp.my->ti_string[n-1], pp.my->Ei_string,_group_number);
+          active_peer->send_message(vss);
+          ilog("send vss message to ${peer}\n\n",("peer",active_peer->get_remote_endpoint()));
+        }
+        catch(const std::exception& e)
+        {
+          std::cerr << e.what() << '\n';
+        }
+        
+      }
+    }
+//-------------------------------------------------
     void node_impl::connect_to_task(peer_connection_ptr new_peer,
                                     const fc::ip::endpoint& remote_endpoint)
     {
@@ -4706,6 +4832,7 @@ namespace graphene { namespace net {
     void node_impl::connect_to_p2p_network()
     {
       VERIFY_CORRECT_THREAD();
+      
       assert(_node_public_key != fc::ecc::public_key_data());
 
       assert(!_accept_loop_complete.valid() &&
@@ -4716,17 +4843,19 @@ namespace graphene { namespace net {
              !_terminate_inactive_connections_loop_done.valid() &&
              !_fetch_updated_peer_lists_loop_done.valid() &&
              !_bandwidth_monitor_loop_done.valid() &&
-             !_dump_node_status_task_done.valid());
+             !_dump_node_status_task_done.valid() &&
+             !_broadcast_vk_message_loop_done.valid());
       if (_node_configuration.accept_incoming_connections)
-        _accept_loop_complete = async_task( [=](){ accept_loop(); }, "accept_loop");
-      _p2p_network_connect_loop_done = async_task( [=]() { p2p_network_connect_loop(); }, "p2p_network_connect_loop" );
+        _accept_loop_complete = async_task( [=](){ accept_loop(); }, "accept_loop");//将已知的节点加入handshaking_connections,send_hello_message
+      _p2p_network_connect_loop_done = async_task( [=]() { p2p_network_connect_loop(); }, "p2p_network_connect_loop" );//不断监听链接请求，将新节点加入handshaking_connections,connect_to_endpoint,connect_to_task(节点间相互发送消息，获取节点状态),read_loop,on_message,根据收到的消息进行处理，建立连接等
       _fetch_sync_items_loop_done = async_task( [=]() { fetch_sync_items_loop(); }, "fetch_sync_items_loop" );
       _fetch_item_loop_done = async_task( [=]() { fetch_items_loop(); }, "fetch_items_loop" );
       _advertise_inventory_loop_done = async_task( [=]() { advertise_inventory_loop(); }, "advertise_inventory_loop" );
       _terminate_inactive_connections_loop_done = async_task( [=]() { terminate_inactive_connections_loop(); }, "terminate_inactive_connections_loop" );
-      _fetch_updated_peer_lists_loop_done = async_task([=](){ fetch_updated_peer_lists_loop(); }, "fetch_updated_peer_lists_loop");
+      _fetch_updated_peer_lists_loop_done = async_task([=](){ fetch_updated_peer_lists_loop(); }, "fetch_updated_peer_lists_loop");//address_request_message,更新自己的地址列表，将别的节点的已知节点地址加入自己的潜在列表，在p2p_network_connect_loop中进行链接
       _bandwidth_monitor_loop_done = async_task([=](){ bandwidth_monitor_loop(); }, "bandwidth_monitor_loop");
       _dump_node_status_task_done = async_task([=](){ dump_node_status_task(); }, "dump_node_status_task");
+      _broadcast_vk_message_loop_done = async_task([=] () {broadcast_vk_message_loop();}, "broadcast vk message");
     }
 
     void node_impl::add_node(const fc::ip::endpoint& ep)
@@ -4802,10 +4931,10 @@ namespace graphene { namespace net {
       VERIFY_CORRECT_THREAD();
       return get_connection_to_endpoint( remote_endpoint ) != peer_connection_ptr();
     }
-
+//将节点加入active队列
     void node_impl::move_peer_to_active_list(const peer_connection_ptr& peer)
     {
-      VERIFY_CORRECT_THREAD();
+      VERIFY_CORRECT_THREAD();//同步与互斥管理
       _active_connections.insert(peer);
       _handshaking_connections.erase(peer);
       _closing_connections.erase(peer);
@@ -4813,6 +4942,14 @@ namespace graphene { namespace net {
       fc_ilog(fc::logger::get("sync"), "New peer is connected (${peer}), now ${count} active peers",
               ("peer", peer->get_remote_endpoint())
               ("count", _active_connections.size()));
+      ilog("New peer is connected (${peer}), now ${count} active peers",
+              ("peer", peer->get_remote_endpoint())
+              ("count", _active_connections.size()));
+      send_vss_message(peer);
+      //不断检查是否形成了vk
+
+      ilog("send a vss message to ${peer}",("peer",peer->get_remote_endpoint()));
+      
     }
 
     void node_impl::move_peer_to_closing_list(const peer_connection_ptr& peer)
@@ -4963,7 +5100,7 @@ namespace graphene { namespace net {
       VERIFY_CORRECT_THREAD();
       return _actual_listening_endpoint;
     }
-
+//获取链接用户
     std::vector<peer_status> node_impl::get_connected_peers() const
     {
       VERIFY_CORRECT_THREAD();
@@ -5045,13 +5182,13 @@ namespace graphene { namespace net {
     {
       VERIFY_CORRECT_THREAD();
       fc::uint160_t hash_of_message_contents;
-      if( item_to_broadcast.msg_type == graphene::net::block_message_type )
+      if( item_to_broadcast.msg_type == graphene::net::block_message_type )//广播区块
       {
         graphene::net::block_message block_message_to_broadcast = item_to_broadcast.as<graphene::net::block_message>();
         hash_of_message_contents = block_message_to_broadcast.block_id; // for debugging
         _most_recent_blocks_accepted.push_back( block_message_to_broadcast.block_id );
       }
-      else if( item_to_broadcast.msg_type == graphene::net::trx_message_type )
+      else if( item_to_broadcast.msg_type == graphene::net::trx_message_type )//广播交易
       {
         graphene::net::trx_message transaction_message_to_broadcast = item_to_broadcast.as<graphene::net::trx_message>();
         hash_of_message_contents = transaction_message_to_broadcast.trx.id(); // for debugging
@@ -5060,8 +5197,8 @@ namespace graphene { namespace net {
       message_hash_type hash_of_item_to_broadcast = item_to_broadcast.id();
 
       _message_cache.cache_message( item_to_broadcast, hash_of_item_to_broadcast, propagation_data, hash_of_message_contents );
-      _new_inventory.insert( item_id(item_to_broadcast.msg_type, hash_of_item_to_broadcast ) );
-      trigger_advertise_inventory_loop();
+      _new_inventory.insert( item_id(item_to_broadcast.msg_type, hash_of_item_to_broadcast ) );//加入广播队列
+      trigger_advertise_inventory_loop();//触发广播
     }
 
     void node_impl::broadcast( const message& item_to_broadcast )
@@ -5192,6 +5329,7 @@ namespace graphene { namespace net {
       info["node_public_key"] = _node_public_key;
       info["node_id"] = _node_id;
       info["firewalled"] = _is_firewalled;
+      info["group_number"] = _group_number;
       return info;
     }
     fc::variant_object node_impl::network_get_usage_stats() const
@@ -5269,8 +5407,8 @@ namespace graphene { namespace net {
     return my->method_name(__VA_ARGS__)
 #endif // P2P_IN_DEDICATED_THREAD
 
-  node::node(const std::string& user_agent) :
-    my(new detail::node_impl(user_agent))
+  node::node(const std::string& user_agent,const uint16_t group_number) :
+    my(new detail::node_impl(user_agent,group_number))
   {
   }
 
@@ -5419,7 +5557,6 @@ namespace graphene { namespace net {
   {
     INVOKE_IN_IMPL(close);
   }
-
   struct simulated_network::node_info
   {
     node_delegate* delegate;
@@ -5439,6 +5576,7 @@ namespace graphene { namespace net {
 
   void simulated_network::message_sender(node_info* destination_node)
   {
+    // ilog("this is message_sender\n\n");
     while (!destination_node->messages_to_deliver.empty())
     {
       try

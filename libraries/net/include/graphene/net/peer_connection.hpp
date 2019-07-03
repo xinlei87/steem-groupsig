@@ -216,7 +216,9 @@ namespace graphene { namespace net
       uint16_t inbound_port = 0;
       uint16_t outbound_port = 0;
       /// @}
-
+//------------------group-signature--------------------
+      uint16_t group_number;
+//---------------------------------------------------
       typedef std::unordered_map<item_id, fc::time_point> item_to_time_map_type;
 
       /// blockchain synchronization state data
@@ -317,6 +319,7 @@ namespace graphene { namespace net
       bool is_inventory_advertised_to_us_list_full() const;
       bool performing_firewall_check() const;
       fc::optional<fc::ip::endpoint> get_endpoint_for_connecting() const;
+//--------group-signature--------------
     private:
       void send_queued_messages_task();
       void accept_connection_task();

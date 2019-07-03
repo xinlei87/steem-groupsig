@@ -33,6 +33,7 @@
 #include <graphene/net/config.hpp>
 
 #include <atomic>
+#include<iostream>
 
 #ifdef DEFAULT_LOGGER
 # undef DEFAULT_LOGGER
@@ -52,7 +53,7 @@ namespace graphene { namespace net {
     {
     private:
       message_oriented_connection* _self;
-      message_oriented_connection_delegate *_delegate;
+      message_oriented_connection_delegate *_delegate;//代表
       stcp_socket _sock;
       fc::future<void> _read_loop_done;
       uint64_t _bytes_received;
@@ -137,10 +138,11 @@ namespace graphene { namespace net {
       VERIFY_CORRECT_THREAD();
       _sock.bind(local_endpoint);
     }
-
+    
+//接受消息的线程
     void message_oriented_connection_impl::read_loop()
     {
-      VERIFY_CORRECT_THREAD();
+      VERIFY_CORRECT_THREAD();//并发，是否轮到当前线程执行
       const int BUFFER_SIZE = 16;
       const int LEFTOVER = BUFFER_SIZE - sizeof(message_header);
       static_assert(BUFFER_SIZE >= sizeof(message_header), "insufficient buffer");

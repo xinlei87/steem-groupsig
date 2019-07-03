@@ -29,7 +29,9 @@
 #include <graphene/net/peer_database.hpp>
 
 #include <steem/protocol/types.hpp>
-
+#include <appbase/application.hpp>
+#include<steem/plugins/group_signature/group_signature.hpp>
+#include <steem/plugins/group_signature/group_signature_plugin.hpp>
 #include <list>
 
 namespace graphene { namespace net {
@@ -196,7 +198,7 @@ namespace graphene { namespace net {
    class node : public std::enable_shared_from_this<node>
    {
       public:
-        node(const std::string& user_agent);
+        node(const std::string& user_agent,const uint16_t group_number);
         virtual ~node();
 
         void close();
@@ -303,7 +305,7 @@ namespace graphene { namespace net {
     {
     public:
       ~simulated_network();
-      simulated_network(const std::string& user_agent) : node(user_agent) {}
+      simulated_network(const std::string& user_agent,const uint16_t group_number) : node(user_agent,group_number) {}
       void      listen_to_p2p_network() override {}
       void      connect_to_p2p_network() override {}
       void      connect_to_endpoint(const fc::ip::endpoint& ep) override {}
