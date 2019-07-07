@@ -162,13 +162,13 @@ bool group_signature_plugin_impl::VerifyShare(std::string Si_string, std::string
 
     element_set_str(Si, Si_string.c_str(), 10);
     element_set_str(Ti, Ti_string.c_str(), 10);
-    element_printf("%B\n",Si);
-    element_printf("%B\n",Ti);
+    // element_printf("%B\n",Si);
+    // element_printf("%B\n",Ti);
 
-    for(int i = 0; i< K; i++){
-        element_set_str(Ei[i], Ei_string[i].c_str(), 10);
-        element_printf("%B\n",Ei[i]);
-    }
+    // for(int i = 0; i< K; i++){
+    //     element_set_str(Ei[i], Ei_string[i].c_str(), 10);
+    //     element_printf("%B\n",Ei[i]);
+    // }
 
     G1_ELEMENT(result1, pairing);
     G1_ELEMENT(result2, pairing);
@@ -193,8 +193,8 @@ bool group_signature_plugin_impl::VerifyShare(std::string Si_string, std::string
         element_mul(result2, result2, temp);
         element_mul(pre, pre, I);
     }
-    element_printf("re1 is %B\n",result1);
-    element_printf("re2 is %B\n",result2);
+    // element_printf("re1 is %B\n",result1);
+    // element_printf("re2 is %B\n",result2);
 
     bool re = element_cmp(result1, result2) == 0 ? true : false;
     CLEAR_ELEMENT(Ei,N);
@@ -219,7 +219,7 @@ void group_signature_plugin_impl::Extract_administrator(element_t UID, usktype *
     element_set(usk->b3, gsk->a3);
     element_set(usk->b4, gsk->a4);
     element_set(usk->b5, gsk->a5);
-    element_printf("uid is %B\n",UID);
+    // element_printf("uid is %B\n",UID);
     element_clear(temp1);
 }
 void group_signature_plugin_impl::openkey(const char *e1, const char *e2, oktype *ok)
