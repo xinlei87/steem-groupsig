@@ -22,7 +22,13 @@ namespace steem { namespace plugins { namespace group_signature {
                 a.vk = temp1;
                 return a;
             }
-
+            get_pk_return get_pk(const get_pk_args &args) const {
+                get_pk_return a;
+                char temp1[400] = {'\0'};
+                element_snprintf(temp1,320,"%B", _gp.my->mpk->h1);
+                a.pk = temp1;
+                return a;
+            }
             get_ok_return get_ok(const get_ok_args &args)const {
                 get_ok_return b;
                 const char *e1 = args.e1.c_str();
@@ -37,12 +43,15 @@ namespace steem { namespace plugins { namespace group_signature {
                 b.ok2 = temp2;
                 return b;
             }
-
+            
             extract_return extract(const extract_args &args)
             {
                 extract_return key;
                 ZR_ELEMENT(UID,_gp.my->pairing);
-                element_from_hash(UID,(char *)args.userID.c_str(),(int)args.userID.length());
+                int l = (int)strlen(args.userID.c_str());
+                printf("uerID length is %d\n", l);
+                printf("userID is %s\n",args.userID.c_str());
+                element_from_hash(UID,(char *)args.userID.c_str(),l);
                 usktype usk(_gp.my->pairing);
                 _gp.my->Extract_administrator(UID,&usk);
                 char temp1[400] = {'\0'};
@@ -77,7 +86,7 @@ namespace steem { namespace plugins { namespace group_signature {
 
     group_signature_api::~group_signature_api() {}
 
-    DEFINE_LOCKLESS_APIS( group_signature_api, (get_vk) (get_ok) (extract));
+    DEFINE_LOCKLESS_APIS( group_signature_api, (get_vk) (get_pk) (get_ok) (extract));
     
 }
 }

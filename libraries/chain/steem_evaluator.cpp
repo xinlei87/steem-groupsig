@@ -2928,7 +2928,7 @@ void commit_paper_evaluator::do_apply( const commit_paper_operation& o ){
    element_t m;
    element_init_Zr(m, _gpp.my->pairing);
    element_from_hash(m,(void *)o.title.c_str(),(int)o.title.length());
-
+   // element_printf("m is %B\n\n",m);
    FC_ASSERT(_gpp.my->Verify(m,&sig), "Group signature is invalid");
    //创建paper_object,并将其写入数据库中
 
