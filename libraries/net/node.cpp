@@ -1969,9 +1969,12 @@ namespace graphene { namespace net {
       ilog("received a vss message from ${peer}",("peer",originating_peer->get_remote_endpoint()));
       uint16_t n = vss_message_received.number -1;
       std::cout<<"receive a vss message "<<vss_message_received.si<<" "<<vss_message_received.ti<<" "<<vss_message_received.number<<"\n\n";
+      for(int i = 0; i< (int)vss_message_received.Ei.size(); i++){
+        std::cout<<vss_message_received.Ei[i]<<"\n";
+      }
       //存放share
       steem::plugins::group_signature::group_signature_plugin& pp = appbase::app().get_plugin<steem::plugins::group_signature::group_signature_plugin>();
-      if(pp.my->si_string_received[n] == "" ){
+      if(pp.my->si_string_received[n] == "" || pp.my->si_string_received[n] != vss_message_received.si){
         if(pp.my->VerifyShare(vss_message_received.si, vss_message_received.ti, vss_message_received.Ei))
         {
           pp.my->si_string_received[n] = vss_message_received.si;
@@ -1995,10 +1998,13 @@ namespace graphene { namespace net {
       uint16_t n = vk_message_received.number -1;
       std::cout<<"received a vk message\n\n";
       steem::plugins::group_signature::group_signature_plugin& pp = appbase::app().get_plugin<steem::plugins::group_signature::group_signature_plugin>();
-      if(pp.my->g_alpha_i_string_received[n] == ""){
+      if(pp.my->g_alpha_i_string_received[n] == "" || pp.my->g_alpha_i_string_received[n] != vk_message_received.vk){
         std::cout<<"ok\n\n";
         pp.my->g_alpha_i_string_received[n] = vk_message_received.vk;
         pp.my->g_alphaGen();
+      }
+      else{
+        std::cout<<"this vk message is already received\n\n";
       }
     }
 //解析收到的hellomessage
@@ -4445,6 +4451,7 @@ namespace graphene { namespace net {
     {
       new_peer->accept_connection(); // this blocks until the secure connection is fully negotiated
       send_hello_message(new_peer);
+      // send_vss_message(new_peer);
     }
 
     void node_impl::accept_loop()
@@ -4945,6 +4952,7 @@ namespace graphene { namespace net {
       ilog("New peer is connected (${peer}), now ${count} active peers",
               ("peer", peer->get_remote_endpoint())
               ("count", _active_connections.size()));
+      std::cout<<"this is active list\n\n";
       send_vss_message(peer);
       //不断检查是否形成了vk
 

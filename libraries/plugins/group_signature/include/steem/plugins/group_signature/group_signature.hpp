@@ -18,13 +18,15 @@ namespace detail {
         
         gsktype* gsk;
         element_t vk;
-        std::string vk_string;
 
         mpktype *mpk;
         pairing_t pairing;
 
         element_t GID;
         element_t* Ei = NULL;
+        element_t* g_alpha_i;
+        
+        std::string vk_string;
 
         std::vector<std::string> si_string;
         std::vector<std::string> ti_string; 
@@ -34,10 +36,11 @@ namespace detail {
         std::vector<std::string> ti_string_received;
         std::vector<std::string> g_alpha_i_string_received;
 
+
         group_signature_plugin_impl();
         ~group_signature_plugin_impl();
 
-        void L(element_t I, element_t *l);
+        void L(element_t* selected, int index, element_t *l);
         bool VerifyShare(std::string Si_string, std::string Ti_string, std::vector<std::string> Ei_string);
         void GenSiTi(element_t *F, element_t *temp);
         void EiGen(element_t *F, element_t *G, int threshold, element_t *temp);

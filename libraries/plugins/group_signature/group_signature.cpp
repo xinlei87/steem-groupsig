@@ -17,32 +17,59 @@ namespace detail
 
 group_signature_plugin_impl::group_signature_plugin_impl()
 {
+
 }
 
 group_signature_plugin_impl::~group_signature_plugin_impl()
 {
     CLEAR_ELEMENT(Ei, K);
+    CLEAR_ELEMENT(g_alpha_i, N);
 }
 
-void group_signature_plugin_impl::L(element_t I, element_t *l)
+void group_signature_plugin_impl::L(element_t* selected, int index, element_t *l)
 {
-    ZR_ELEMENT(temp, pairing);
+    element_set1(*l);
+    
+    element_t I;
+    element_init_Zr(I, pairing);
+
+    element_set_si(I, index+1);
+    
+    element_t temp;
+    element_init_Zr(temp, pairing);
     element_set1(temp);
+    
+    element_t J;
+    element_init_Zr(J, pairing);
 
-    ZR_ELEMENT(J, pairing);
-    element_set1(J);
-
-    ZR_ELEMENT(temp1, pairing);
-    ZR_ELEMENT(temp2, pairing);
-    for (int i = 0; i < N; i++)
+    element_t temp1, temp2;
+    element_init_Zr(temp1, pairing);
+    element_init_Zr(temp2, pairing);
+    
+    int j = 0;
+    element_t O;
+    element_init_G1(O, pairing);
+    element_set0(O);
+    for (int i = 0; i < K; i++)
     {
+        while(element_cmp(selected[j],O) == 0){
+            j++;
+        }
+        element_set_si(J, j+1);
         if (element_cmp(J, I))
         {
+            element_printf("I is %B\n", I);
+            element_printf("J is %B\n", J);
             element_sub(temp1, J, I);
             element_div(temp2, J, temp1);
             element_mul(*l, *l, temp2);
+            j++;
         }
-        element_add(J, J, temp);
+        else
+        {
+            j++;
+        }
+        
     }
     element_clear(temp);
     element_clear(J);
@@ -144,11 +171,14 @@ void group_signature_plugin_impl::GrpSetup(element_t alpha, element_t r1)
     element_mul(gsk->a0, temp1, temp);
 
     element_pow_zn(vk, mpk->g, alpha);
+    //记录本节点的g_alpha_i
+    element_set(g_alpha_i[number],vk);
+
     char temp_str[400];
     element_snprintf(temp_str, 320, "%B",vk);
     vk_string = temp_str;
     element_printf("%B\n",vk);
-    g_alpha_i_string_received[number] = vk_string;
+
     std::cout<<"this is vk "<<vk_string<<"\n\n";
     element_clear(temp);
     element_clear(temp1);
@@ -165,10 +195,10 @@ bool group_signature_plugin_impl::VerifyShare(std::string Si_string, std::string
     // element_printf("%B\n",Si);
     // element_printf("%B\n",Ti);
 
-    // for(int i = 0; i< K; i++){
-    //     element_set_str(Ei[i], Ei_string[i].c_str(), 10);
-    //     element_printf("%B\n",Ei[i]);
-    // }
+    for(int i = 0; i< K; i++){
+        element_set_str(Ei[i], Ei_string[i].c_str(), 10);
+        // element_printf("%B\n",Ei[i]);
+    }
 
     G1_ELEMENT(result1, pairing);
     G1_ELEMENT(result2, pairing);
@@ -185,7 +215,7 @@ bool group_signature_plugin_impl::VerifyShare(std::string Si_string, std::string
     ZR_ELEMENT(pre, pairing);
     element_set1(pre);
     element_set_si(I, number+1);
-
+    element_printf("in verify share I is %B\n\n",I);
     G1_ELEMENT(temp, pairing);
     for (int j = 0; j < K; j++)
     {
@@ -412,22 +442,26 @@ void group_signature_plugin_impl::mpkGen()
 void group_signature_plugin_impl::g_alphaGen()
 {
     std::cout<<"this is g_alpha\n\n";
-    G1_ELEMENT_ARRAY(g_temp,N,pairing);
-    int j = 0;
+    int count = 0;
     for(int i = 0; i< N; i++){
         if(g_alpha_i_string_received[i] != "")
         {
-            element_set_str(g_temp[i],(const char*)g_alpha_i_string_received[i].c_str(),10);
-            j++;
+            std::cout<<"i "<<i<<" g_alpha_i_string is"<<g_alpha_i_string_received[i]<<"\n\n";
+            element_set_str(g_alpha_i[i],(const char*)g_alpha_i_string_received[i].c_str(),10);
+            count++;
+            if(count >= K-1){
+                break;
+            }
         }
-        else
-            element_set1(g_temp[i]);
     }
 
-    if(j < K)
+    if(count < K-1)
     {
-        std::cout<<"vk is not K j is "<<j<<"\n\n";
+        std::cout<<"vk is not K j is "<<count<<"\n\n";
         return;
+    }
+    else{
+        std::cout<<"count is "<<count<<"\n\n";
     }
 
     ZR_ELEMENT(I, pairing);
@@ -435,17 +469,12 @@ void group_signature_plugin_impl::g_alphaGen()
 
     element_set1(I);
     element_set1(e);
+    
+    ZR_ELEMENT(l, pairing);
 
-    ZR_ELEMENT_ARRAY(Li, N, pairing);
-    INIT_ARRAY_1(Li, N);
-    for (int i = 0; i < N; i++)
-    {
-        element_set1(Li[i]);
-        L(I, &Li[i]);
-        element_add(I, I, e);
-    }
-    element_clear(I);
-    element_clear(e);
+    G1_ELEMENT(O,pairing);
+    
+    element_set0(O);
 
     G1_ELEMENT(g_alpha, pairing);
     element_set1(g_alpha);
@@ -453,14 +482,23 @@ void group_signature_plugin_impl::g_alphaGen()
     G1_ELEMENT(temp, pairing);
     for (int i = 0; i < N; i++)
     {
-        element_pow_zn(temp, g_temp[i], Li[i]);
+        while(i < N && element_cmp(g_alpha_i[i], O) == 0){
+            i++;
+        }
+        if(i >= N){
+            break;
+        }
+        element_set1(l);
+        L(g_alpha_i, i, &l);
+        element_printf("l is %B\n", l);
+        element_pow_zn(temp, g_alpha_i[i], l);
         element_mul(g_alpha, g_alpha, temp);
     }
     element_set(mpk->h1, g_alpha);
     element_printf("h1 is %B\n",mpk->h1);
     element_clear(g_alpha);
-    CLEAR_ELEMENT(Li,N);
-    CLEAR_ELEMENT(g_temp,N);
+    element_clear(l);
+    element_clear(O);
 }
 bool group_signature_plugin_impl::VerifyShareSelf(element_t Si, element_t Ti, element_t *Ei, int threshold, int i)
 {
@@ -487,6 +525,7 @@ bool group_signature_plugin_impl::VerifyShareSelf(element_t Si, element_t Ti, el
     element_init_Zr(pre, pairing);
     element_set1(pre);
     element_set_si(I, i);
+    element_printf("in verifyself share I is %B\n\n",I);
 
     element_t temp;
     element_init_G1(temp, pairing);
@@ -578,9 +617,16 @@ sign0 1\n"};
     element_init_G1(my->vk, my->pairing);
     //产生要发送的秘钥分享，放在p2p中，当P2P节点启动后，每当有新的节点建立链接，则将秘钥发送出去。
     my->Ei = new element_t[my->K];
+    my->g_alpha_i = new element_t[my->N];
+
     for (int i = 0; i < my->K; i++)
     {
         element_init_G1(my->Ei[i], my->pairing);
+    }
+
+    for(int i = 0; i< my->N; i++){
+        element_init_G1(my->g_alpha_i[i], my->pairing);
+        element_set0(my->g_alpha_i[i]);
     }
 
     G1_ELEMENT_ARRAY(s, my->N, my->pairing);

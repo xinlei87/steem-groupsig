@@ -43,7 +43,7 @@ class GroupSignature():
         
         return pk
 
-    def uskGen(self,usklist, pk, GID, UID, L,n):
+    def uskGen(self,usklist, pk, GID, UID, L,k):
             
         b0 = self.group.gen1_0(1)
         b3 = self.group.gen1_0(1)
@@ -52,7 +52,7 @@ class GroupSignature():
         
         r2 = self.group.random(ZR)
 
-        for i in range(n):
+        for i in range(k):
             b0 = b0*(usklist[i]['b0']**L[i])
             b3 = b3*(usklist[i]['b3']**L[i])
             b4 = b4*(usklist[i]['b4']**L[i])
@@ -76,8 +76,9 @@ class GroupSignature():
             L[i].set(1)
             I.set(i+1)
             for j in range(1,k+1):
+                print(j)
                 J.set(j)
-                if i+1 != j:
+                if (i+1) != j:
                     L[i]=L[i]*((J)/(J-I))
         return L
 
@@ -142,14 +143,14 @@ class GroupSignature():
 
         return signature
     
-    def open(self,okliststr,L):
+    def open(self,okliststr,L,k):
         
         oklist =[]
         for ok in okliststr:
             oklist.append({'ok1':self.group.fromstr(ok['ok1'], 10, GT),'ok2':self.group.fromstr(ok['ok2'], 10, GT)})
         ok1 = self.group.gen1_0(1)
         ok2 = self.group.gen1_0(1)
-        for i in range (len(okliststr)):
+        for i in range (k):
             ok1 = ok1 * (oklist[i]['ok1']**L[i])
             ok2 = ok2 * (oklist[i]['ok2']**L[i])
         
@@ -158,17 +159,19 @@ class GroupSignature():
 def main():
     # 假设不存在不可用节点(无法判断节点状态)
     k = 2
-    n =2
+    n =3
     nodelist =[
-        'http://101.76.219.253:8090',
-        'http://101.76.217.217:8090'
+        'http://101.76.221.144:8090',
+        'http://101.76.221.115:8090',
+        'http://101.76.221.115:8092'
+
     ]
     groupobj = PairingGroup('SS512')
 
     group_signature = GroupSignature(groupobj)
 
     L = group_signature.LGen(n, k)
-
+    print(L)
     steembase.chains.known_chains['TEST'] = {
         'chain_id': '18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e',
         'prefix': 'TST', 'steem_symbol': 'TESTS', 'sbd_symbol': 'TBD', 'vests_symbol': 'VESTS'
@@ -196,16 +199,14 @@ def main():
         
         vkliststr.append(clientlist[i].get_vk()['vk'])
         vklist.append(group_signature.group.fromstr(vkliststr[i],10, G1))
-        re = clientlist[i].user_extract(userID)
-        clientlist[i].get_account("initminer2")
-
+        
         uskliststr.append(clientlist[i].user_extract(userID))
         usklist.append({})
         usklist[i]['b0'] = group_signature.group.fromstr(uskliststr[i]['b0'], 10, G2)
         usklist[i]['b3'] = group_signature.group.fromstr(uskliststr[i]['b3'], 10, G2)
         usklist[i]['b4'] = group_signature.group.fromstr(uskliststr[i]['b4'], 10, G2)
         usklist[i]['b5'] = group_signature.group.fromstr(uskliststr[i]['b5'], 10, G1)
-        
+        print(usklist[i])
         if h1str == "":
             h1str = clientlist[i].get_pk()['pk']
             pk = group_signature.pkGen(h1str)
@@ -218,7 +219,7 @@ def main():
         print("there is not k admin\n")
         return 
     
-    usk = group_signature.uskGen(usklist, pk, GID, UID, L,n)
+    usk = group_signature.uskGen(usklist, pk, GID, UID, L,k)
     # print(pk)
     
     account = 'initminer2'
@@ -252,7 +253,7 @@ def main():
             "s3":str(sig['s3'])
         }
     )
-    tx = TransactionBuilder(steemd_instance=clientlist[0].steemd,wallet_instance = clientlist[0].wallet,no_broadcast = False)
+    tx = TransactionBuilder(steemd_instance=clientlist[1].steemd,wallet_instance = clientlist[0].wallet,no_broadcast = False)
 
     tx.appendOps(op)
     tx.appendSigner('initminer2','posting')
@@ -273,7 +274,7 @@ def main():
         print("the number of ok is not enough\n")
         return
     
-    lam = group_signature.open(okliststr,L)
+    lam = group_signature.open(okliststr,L,k)
     
     E = (pk['n'] ** UID) * lam
     
