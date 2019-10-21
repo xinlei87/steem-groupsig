@@ -1,0 +1,40 @@
+suggest_brain_key 
+{
+  "brain_priv_key": "OASES HAWKBIT TALAYOT UMIRI VARDY DOWDY GALIOT SODOMIC DRIER PAPISM CLASSED UNSPAN OVERACT ODDSMAN WHUD GLYCINE",
+  "wif_priv_key": "5Jr9HrdGkmS1554ALZSB5qciZoj4phwX5yeptn535d3avRfGaGx",
+  "pub_key": "TST6bzcR5eVjKkLC8m9q6Yq5SVHgd7nxhQTSFr8cRAYmKMJnetCRK"
+}
+
+get_private_key_from_password zy1 owner 5Jr9HrdGkmS1554ALZSB5qciZoj4phwX5yeptn535d3avRfGaGx
+[
+  "TST579FsY9TTG7Ji1FT5XV8xuHXjKLahDeFZ5ik89ZHC8oMKq2YHA",
+  "5KNQ8S6mqsU61F313fi2Lk4yNUSn7D9K8bH1YrDWGeitC88nNuR"
+]
+
+get_private_key_from_password zy1 active 5Jr9HrdGkmS1554ALZSB5qciZoj4phwX5yeptn535d3avRfGaGx
+[
+  "TST8Hiy9SvTj5YWSwY8rNpg3c1aBX3BPfFZrwnK5Em5daDr7ft5FC",
+  "5K9tB6y5zGhsjAbX7VzEHz2i5gdjLvFz7AZYNmJqTXJT2eccsps"
+]
+
+get_private_key_from_password zy1 posting 5Jr9HrdGkmS1554ALZSB5qciZoj4phwX5yeptn535d3avRfGaGx
+[
+  "TST6bbn1dUF1KeWnjrhqTvGbCtaR9V69oW9p5msaRCwYfQXzDyJgv",
+  "5Hs4jcm5X4sanCnUKNFCjrq2irN8sH1Krzsb13Qd6DHqutZbhqu"
+]
+
+get_private_key_from_password zy1 memo 5Jr9HrdGkmS1554ALZSB5qciZoj4phwX5yeptn535d3avRfGaGx
+[
+  "TST8XmmHCQHYigiFH7HTKoi3m2ywmQR6CSAkNvK9ZDFNpDzKs6GwV",
+  "5HzU8Y1TkxJemmzedarDb4PyUWL9AwYDiN2g37Zh1x5vAv9hCGk"
+]
+
+import_key 5J3yMruND2TADZ7cZc6Cnp4VePrnehei2wvGdnLgf3aEj2nDGhc   //initminer2 private-key 理论上需要acctivekey
+
+create_account_with_keys initminer2 zy1  "" TST579FsY9TTG7Ji1FT5XV8xuHXjKLahDeFZ5ik89ZHC8oMKq2YHA TST8Hiy9SvTj5YWSwY8rNpg3c1aBX3BPfFZrwnK5Em5daDr7ft5FC TST6bbn1dUF1KeWnjrhqTvGbCtaR9V69oW9p5msaRCwYfQXzDyJgv TST8XmmHCQHYigiFH7HTKoi3m2ywmQR6CSAkNvK9ZDFNpDzKs6GwV true
+
+transfer_to_vesting initminer2 zy1  "20.000 TESTS" true
+
+import_key 5K9tB6y5zGhsjAbX7VzEHz2i5gdjLvFz7AZYNmJqTXJT2eccsps  //zy1的activekey
+
+update_witness zy1 "101.76.212.247:8094" TST6bzcR5eVjKkLC8m9q6Yq5SVHgd7nxhQTSFr8cRAYmKMJnetCRK {} true  //zy1的pubkey

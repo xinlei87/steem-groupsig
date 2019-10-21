@@ -13,9 +13,9 @@
 #define STEEM_BLOCKCHAIN_VERSION              ( version(0, 22, 0) )
 
 #define STEEM_INIT_PRIVATE_KEY                (fc::ecc::private_key::regenerate(fc::sha256::hash(std::string("initminer2"))))
-// #define STEEM_INIT_PRIVATE_KEY                (std::string("5JHKRW4d7BTU1V1CXDQAPmDfBBFr6XqQoDDUpmPP1JW38s5NjeW"))
+// #define STEEM_INIT_PRIVATE_KEY                (std::string("5JHKRW4d7BTU1V1CXDQAPmDfBBFr6XqQoDDUpmPP1JW38s5NjeW")) 5J3yMruND2TADZ7cZc6Cnp4VePrnehei2wvGdnLgf3aEj2nDGhc
 
-#define STEEM_INIT_PUBLIC_KEY_STR             (std::string("TST8QQ8wVz44d4AMPK5YYa7ZoKvXHccm8KqDrRvHSDgwJUG1Sf2wA"))
+#define STEEM_INIT_PUBLIC_KEY_STR             (std::string("TST7QFCHSxewadQ1ABFsWWwQvZX7tEnwj3ikA2T9a34j8MRauZ8AU"))
 #define STEEM_CHAIN_ID (fc::sha256::hash("testnet"))
 // #define STEEM_CHAIN_ID (std::string("18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e"))
 

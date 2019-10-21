@@ -1,0 +1,187 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+./build/programs/steemd/steemd --data-dir ./data
+
+./../build/programs/cli_wallet/cli_wallet -s "ws://127.0.0.1:8091"
+
+set_password test
+
+unlock test
+
+unlocked >>> suggest_brain_key 
+suggest_brain_key
+{
+  "brain_priv_key": "BEETLER GENA CRANE SNUBBY LANOLIN SEALING OCHER MEDIMNO SOCKY SA DECAFID VALHALL COLIMA TIRE PSOCID ACOUASM",
+  "wif_priv_key": "5KAXQAMTC4NCWzCvU1nkkndCfWCsshRZVJqWNYSUTyzZW8uEnZR",
+  "pub_key": "TST651aVa9qqF7V43rmZgajgZThKigk66LyhnNgxQdEmY6rSKMbZx"
+}
+
+unlocked >>> get_private_key_from_password alice owner 5KTRgZwUv3oLqQg7KKGvHAkrNZ1kjQYdSkSHSUDupddGKhs54qG
+get_private_key_from_password alice owner 5KTRgZwUv3oLqQg7KKGvHAkrNZ1kjQYdSkSHSUDupddGKhs54qG
+[
+  "TST5qVzxS3YJX4EqXcyBVq8khBe8DWovNxHqMfVDK1b1Y9iqrWsSE",
+  "5JqcHfLQ4h56vQHHsj211LjctreqMwEjtcDZDPn3xHMvUb9YSvx"
+]
+unlocked >>> get_private_key_from_password alice active 5KTRgZwUv3oLqQg7KKGvHAkrNZ1kjQYdSkSHSUDupddGKhs54qG
+get_private_key_from_password alice active 5KTRgZwUv3oLqQg7KKGvHAkrNZ1kjQYdSkSHSUDupddGKhs54qG
+[
+  "TST7ZcHbuKaijRcX9w7Wyuyc7hztBNWjRXR376HoXh4anjnXk9xUX",
+  "5J64eGy3KoiD41ieXtCTmvrrpNMXmuPCN6hgk7fLNrKJrwVDnsM"
+]
+unlocked >>> get_private_key_from_password alice posting 5KTRgZwUv3oLqQg7KKGvHAkrNZ1kjQYdSkSHSUDupddGKhs54qG
+get_private_key_from_password alice posting 5KTRgZwUv3oLqQg7KKGvHAkrNZ1kjQYdSkSHSUDupddGKhs54qG
+[
+  "TST5Wji4EusQtrPiNmtKtSi1ZNQwjwYSB2nLkH65K67byPwwXsaVp",
+  "5JQFHHGAoNDyzsLj9o3dKLN36MbMVbTunwEaFZ543BVoFLF6Viz"
+]
+unlocked >>> get_private_key_from_password alice memo 5KTRgZwUv3oLqQg7KKGvHAkrNZ1kjQYdSkSHSUDupddGKhs54qG
+get_private_key_from_password alice memo 5KTRgZwUv3oLqQg7KKGvHAkrNZ1kjQYdSkSHSUDupddGKhs54qG
+[
+  "TST6gNekLT2HEpeHfNseeCV8T2rouGyoNc73D61pbuTE1wzg7D5b7",
+  "5J3kWfLn6w1YbK3agm11iMC2RGbXGqhXgY3gCngbhbE25T4ym9b"
+]
+
+create_account_with_keys initminer alice "" TST5qVzxS3YJX4EqXcyBVq8khBe8DWovNxHqMfVDK1b1Y9iqrWsSE TST7ZcHbuKaijRcX9w7Wyuyc7hztBNWjRXR376HoXh4anjnXk9xUX TST5Wji4EusQtrPiNmtKtSi1ZNQwjwYSB2nLkH65K67byPwwXsaVp TST6gNekLT2HEpeHfNseeCV8T2rouGyoNc73D61pbuTE1wzg7D5b7 true
+
+import_key 5J64eGy3KoiD41ieXtCTmvrrpNMXmuPCN6hgk7fLNrKJrwVDnsM
+
+transfer_to_vesting initminer alice "20.000 TESTS" true
+update_witness alice "101.76.211.144:8090" TST6EAhoWgANrcuuU9LCZ5bEjqzpjCxYYEJ5dNuNvRHJkRuFL6hzw {} true
+
+
+
+
+suggest_brain_key 
+{
+  "brain_priv_key": "IMMURE MUZZILY GALEAGE FUME WHELKY RELOCK OARSMAN COLLUM OCTAVIC FLORENT DARNING BESCARF BETTING SLODGE KEENLY MANGER",
+  "wif_priv_key": "5JUrYjgTbHnvUNrtUM3hZqAmCNnCwWRXw8XAEuzGXwkzDS5CFrd",
+  "pub_key": "TST4y4Fx6TbYGXrFE918H9h8BWyXEwKAJWAcitprEHRnsz4gTvQ8a"
+}
+
+get_private_key_from_password tom owner 5JUrYjgTbHnvUNrtUM3hZqAmCNnCwWRXw8XAEuzGXwkzDS5CFrd
+[
+  "TST6MLdPCAQTJiRWMHQns1UdpnwLNYz5UcWo6SrUrzVqcT9ueCTqE",
+  "5K5jpQm82fnA5UvPEuPWBXR1h4YxeiEr6whsxZgj2xqDHxjfkAs"
+]
+
+get_private_key_from_password tom active 5JUrYjgTbHnvUNrtUM3hZqAmCNnCwWRXw8XAEuzGXwkzDS5CFrd
+[
+  "TST7YjQZh3VWmGh3TpwYvp3yzy8hw27rRqPEvVUTtuTooYyYZtQ9m",
+  "5HzECz7a1Sw5sRpPwfifEuaYFAgA8NnP54GkZbgZScAGrEqMSwL"
+]
+
+get_private_key_from_password tom posting 5JUrYjgTbHnvUNrtUM3hZqAmCNnCwWRXw8XAEuzGXwkzDS5CFrd
+[
+  "TST8JHPi8QvsAratyy1mieUjYRcpLddW35XbSEsVfZbp7ZsmnTQ63",
+  "5KXDvxXrv4HuM79KToLKRDMT22bSJLnqo8vKckm5nUMPL2nEu7d"
+]
+
+get_private_key_from_password tom memo 5JUrYjgTbHnvUNrtUM3hZqAmCNnCwWRXw8XAEuzGXwkzDS5CFrd
+[
+  "TST5ceSiNPZAVhVNF6MAB7UMVxgTAKM1d52BGv9NDMWjvKxUsdsZx",
+  "5JKBFwt5Pp7cvvJCoRJFuTyirypgM6n7xEPSogzejvgmHDsFaKY"
+]
+
+
+import_key 5J3yMruND2TADZ7cZc6Cnp4VePrnehei2wvGdnLgf3aEj2nDGhc
+
+
+create_account_with_keys initminer tom "" TST6MLdPCAQTJiRWMHQns1UdpnwLNYz5UcWo6SrUrzVqcT9ueCTqE TST7YjQZh3VWmGh3TpwYvp3yzy8hw27rRqPEvVUTtuTooYyYZtQ9m TST8JHPi8QvsAratyy1mieUjYRcpLddW35XbSEsVfZbp7ZsmnTQ63 TST5ceSiNPZAVhVNF6MAB7UMVxgTAKM1d52BGv9NDMWjvKxUsdsZx true
+
+
+////////////////////////////////////zy1
+
+suggest_brain_key
+{
+  "brain_priv_key": "PROSER ERIC CRACKY FESS TEUCRIN XYLOYL ABRIM INITIS DOGGY COSINE WHIDAH LEED UNQUIT STAMIN RETRUE EVIRATE",
+  "wif_priv_key": "5JdSLkdVWYFGXJ3aL2QAx5hRdBbR4K6EC2gxyNzDPSbnKNByj4r",
+  "pub_key": "TST6FFUsqE7Rb8hnL7pW7udkqsxPa1n94BxnTJNCsRtGPnawAzu2y"
+}
+
+
+get_private_key_from_password zy1 owner 5JdSLkdVWYFGXJ3aL2QAx5hRdBbR4K6EC2gxyNzDPSbnKNByj4r
+[
+  "TST6yUKDnyynHghQZcZk7fdFyVK2okWrhY6z3QX59WRLoFJfypQug",
+  "5JbguYVjRPmLMZq5zP3y39ZTp9aMFJ3dsKUv2kASWXoa2GtbkKB"
+]
+
+get_private_key_from_password zy1 active 5JdSLkdVWYFGXJ3aL2QAx5hRdBbR4K6EC2gxyNzDPSbnKNByj4r
+[
+  "TST8cMs2GHtRiU3hFnLCXNUhiMKKqbgWU7zcihVrWZYDa8XdpvouZ",
+  "5K8nndbBHQPJn6HZsdZHgyi1WE9mvdC2QKjbrm6DJ4F7XXPK5RB"
+]
+
+get_private_key_from_password zy1 posting 5JdSLkdVWYFGXJ3aL2QAx5hRdBbR4K6EC2gxyNzDPSbnKNByj4r
+[
+  "TST6xqzByBawY18fi9in25N2qQLvBLKpeUFqaLx6WUoMEiDxMXDnq",
+  "5JWqNrz1P5FSUVup7LwX4qUVTeywoFeUyEHu5hHqgvAcAJ1phd6"
+]
+
+
+get_private_key_from_password zy1 memo 5JdSLkdVWYFGXJ3aL2QAx5hRdBbR4K6EC2gxyNzDPSbnKNByj4r
+[
+  "TST8SA39ZRv8omHTqGBkjHgWumaXGS4AjV4XCBT148KbYVxEpmeVj",
+  "5KAQkbKDmWpczqMu1PjG9jCV8yRzJpuw3mFDLsWn5T1xk6j6Y7E"
+]
+
+
+
+create_account_with_keys initminer zy1 "" TST6yUKDnyynHghQZcZk7fdFyVK2okWrhY6z3QX59WRLoFJfypQug TST8cMs2GHtRiU3hFnLCXNUhiMKKqbgWU7zcihVrWZYDa8XdpvouZ TST6xqzByBawY18fi9in25N2qQLvBLKpeUFqaLx6WUoMEiDxMXDnq TST8SA39ZRv8omHTqGBkjHgWumaXGS4AjV4XCBT148KbYVxEpmeVj true
+
+
+
+transfer_to_vesting initminer zy1  "20.000 TESTS" true
+
+update_witness zy1 "192.168.31.233:8094" TST6FFUsqE7Rb8hnL7pW7udkqsxPa1n94BxnTJNCsRtGPnawAzu2y {} true            zy1的suggest_brain_key pubkey
+
+//////////////////////////////////////////////////////////////////
+suggest_brain_key
+{
+  "brain_priv_key": "UPWHELM MESSTIN FRUITER TORMINA JOLTER ENAMDAR TAMMIE UNCOUTH CEROTIN OSAMINE FUFF VITAMER AQUATIC HEAT FRUIT BANYAN",
+  "wif_priv_key": "5J5W7PAJbXZUJ44ZQzCiR8EneMwHCFfvz6ZgUbWnHjRDaLNxiLK",
+  "pub_key": "TST6u2KuEJKdpMit9Xjkb5Gyy5oXqxPuzxnoSwgpEEsANNJFThBXU"
+}
+
+get_private_key_from_password zy2 owner 5J5W7PAJbXZUJ44ZQzCiR8EneMwHCFfvz6ZgUbWnHjRDaLNxiLK
+[
+  "TST8NRtn86zyK7amF1RZ3fErzNfxxa9tgn58WqAKyLyiuF6324DgP",
+  "5KctL2FPQWbxN5r8CFpKUqPBRtjTCYbQDEixaBBxnio1zQDFDsW"
+]
+
+get_private_key_from_password zy2 active 5J5W7PAJbXZUJ44ZQzCiR8EneMwHCFfvz6ZgUbWnHjRDaLNxiLK
+[
+  "TST7GRsSKzbwA4KC4Uv2PaTSLSHj3N69Zt4JicMBfqujFvVJQV8iW",
+  "5JHWv6nojhURnHFF8z1raHFEe22AVRBERGwoxtqgBoYnGfaGnQg"
+]
+get_private_key_from_password zy2 posting 5J5W7PAJbXZUJ44ZQzCiR8EneMwHCFfvz6ZgUbWnHjRDaLNxiLK
+[
+  "TST52FtkZSBeFGxZiNstSJoGZzFnbGH88SrLguzRTuVbMZa2ixqMG",
+  "5KhpaKrZcGYhQPXf6uMBqq3dih3rYZ8V5xyjTG6hnBhY6CvAL9Y"
+]
+get_private_key_from_password zy2 memo 5J5W7PAJbXZUJ44ZQzCiR8EneMwHCFfvz6ZgUbWnHjRDaLNxiLK
+[
+  "TST7e6aibBtfRjjS2knFadpXjaoYeA927KmDvyQuuibV7gt91vgN6",
+  "5HyaPYNN6Nk28kj1XNDhr5BkBiFKeHtjDbHx2YBpqEUF8g6D9MP"
+]
+create_account_with_keys initminer zy2  "" TST8NRtn86zyK7amF1RZ3fErzNfxxa9tgn58WqAKyLyiuF6324DgP TST7GRsSKzbwA4KC4Uv2PaTSLSHj3N69Zt4JicMBfqujFvVJQV8iW TST52FtkZSBeFGxZiNstSJoGZzFnbGH88SrLguzRTuVbMZa2ixqMG TST7e6aibBtfRjjS2knFadpXjaoYeA927KmDvyQuuibV7gt91vgN6 true
+  "transaction_id": "e136a7d8f62f8aba47fc4b23a54937347cb6990a",
+
+transfer_to_vesting initminer zy2  "20.000 TESTS" true   必须转账
+
+update_witness zy2 "192.168.31.233:8098" TST6u2KuEJKdpMit9Xjkb5Gyy5oXqxPuzxnoSwgpEEsANNJFThBXU {} true     "transaction_id": "807a494f9d74684440e4eed0eb8586ac82a3f0ac",
+
+
+//////////////////////////////////////////////////
+./build/programs/steemd/steemd --data-dir ./datazy1
+
+./build/programs/steemd/steemd --data-dir ./data
+
+
+./build/programs/cli_wallet/cli_wallet -s "ws://127.0.0.1:8091"
+
+下次试试 cli—wallet get-block and get-transaction
+
+
+
+
+
+

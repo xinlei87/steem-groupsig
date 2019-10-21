@@ -1,0 +1,41 @@
+suggest_brain_key 
+{
+  "brain_priv_key": "REVIEW SPILITE GLASSY STATANT GALBAN SA CYMAR TRIKIR FUSEE SLATISH COINFER ENSTAMP UNHARD GUCKI POH TUNDUN",
+  "wif_priv_key": "5Hu4E6BDbivfDoUQruqyepa6fb3R1wW6U25u4ppG8zEEZTjGkHM",
+  "pub_key": "TST88WzJs6G4Co8AJi8nKKqDXRZyPfn1iU2sGjBqvy8yTcdxFnEC8"
+}
+
+get_private_key_from_password zy3 owner 5Hu4E6BDbivfDoUQruqyepa6fb3R1wW6U25u4ppG8zEEZTjGkHM
+[
+  "TST71eHGoR6fXExBms546mH2vrpknek48SSeds89GxySPkarru8Ko",
+  "5KUYdtcoQJEj13uTHwi2NnpAgP7DFi8xFJeu2uY8VYVY8P42qHf"
+]
+
+get_private_key_from_password zy3 active 5Hu4E6BDbivfDoUQruqyepa6fb3R1wW6U25u4ppG8zEEZTjGkHM
+[
+  "TST6hmEcLGwwKRdhWJLdBzxVMQiriVNLB9QAeksUKMJvhgbr7LGrq",
+  "5K6vSUveiLbAbJjRWadzACbNqpJAAxRhXaMJhYCvEWEooXzSDLM"
+]
+
+get_private_key_from_password zy3 posting 5Hu4E6BDbivfDoUQruqyepa6fb3R1wW6U25u4ppG8zEEZTjGkHM
+[
+  "TST6gVzYZMZrsRdVwXm85KuAvKfCDH1BhZjAxhJtniCfc2eHkxER2",
+  "5K1JrbM1TG62TmsE9DwFsUszHbhEbEB9wwPPPpBLKwHZRBYazZC"
+]
+
+get_private_key_from_password zy3 memo 5Hu4E6BDbivfDoUQruqyepa6fb3R1wW6U25u4ppG8zEEZTjGkHM
+[
+  "TST77E9ufsCM7UYVdSnzAie3a65GLmUNNzkRgacsxcD1THkrotkfp",
+  "5JMV2GDyV2t4e8BGnpoeduuQ8RPeByinFihHNHfyivJE7KBj6WS"
+]
+
+create_account_with_keys initminer2 zy3  "" TST71eHGoR6fXExBms546mH2vrpknek48SSeds89GxySPkarru8Ko TST6hmEcLGwwKRdhWJLdBzxVMQiriVNLB9QAeksUKMJvhgbr7LGrq TST6gVzYZMZrsRdVwXm85KuAvKfCDH1BhZjAxhJtniCfc2eHkxER2 TST77E9ufsCM7UYVdSnzAie3a65GLmUNNzkRgacsxcD1THkrotkfp true
+
+import_key 5K6vSUveiLbAbJjRWadzACbNqpJAAxRhXaMJhYCvEWEooXzSDLM
+
+transfer_to_vesting initminer2 zy3  "20.000 TESTS" true
+
+
+update_witness zy3 "101.76.216.9:8090" TST88WzJs6G4Co8AJi8nKKqDXRZyPfn1iU2sGjBqvy8yTcdxFnEC8 {} true
+
+

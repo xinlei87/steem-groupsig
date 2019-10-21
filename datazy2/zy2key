@@ -1,0 +1,41 @@
+suggest_brain_key 
+{
+  "brain_priv_key": "JUNK SKIDPAN LOBCOCK ASSLIKE BODGERY UNCIVIC GROINED SERIES ORCHARD CHEAT UPSHEAR PRUDE PRONTO POSSE BUTLERY TOUPEED",
+  "wif_priv_key": "5J3s6iG7qKikEY9rZEqPbQ1RAhY1r6WpKWov9Ky6dgYYUuiz7qr",
+  "pub_key": "TST6tCqVuBZinnE8XaKuhEGpV2APYhknhL285uHD35G14yWBT9Ekw"
+}
+
+get_private_key_from_password zy2 owner 5J3s6iG7qKikEY9rZEqPbQ1RAhY1r6WpKWov9Ky6dgYYUuiz7qr
+[
+  "TST8NpontdSMokAXCiBu1JAG73Wb8DBk5vhmgdeatnpLC5iuBvYnG",
+  "5Kc4yZLRJEMp3taxTuSfwVmDh4qq1p3jP7hUsjpJix98DMa5HmK"
+]
+
+get_private_key_from_password zy2 active 5J3s6iG7qKikEY9rZEqPbQ1RAhY1r6WpKWov9Ky6dgYYUuiz7qr
+[
+  "TST7FqCkVxa6CHVKyYfbeRPJewEYKroKp5noVeHSWLjpXy42C9Yu4",
+  "5JhcHvLNqv3PeXbr96WRq3hP6WVaoYe7caZXBuU9hEN49eb8m93"
+]
+
+get_private_key_from_password zy2 posting 5J3s6iG7qKikEY9rZEqPbQ1RAhY1r6WpKWov9Ky6dgYYUuiz7qr
+[
+  "TST6qKhaHMFKK9WruRipqgfJRRMrkueCSBhiJWjrysZ1hreeaaDMS",
+  "5KPLLsQ3MuWgKvNYqAFRjziWZenBqefDhSe4K1uYuj8hT3zQoKv"
+]
+
+get_private_key_from_password zy2 memo 5J3s6iG7qKikEY9rZEqPbQ1RAhY1r6WpKWov9Ky6dgYYUuiz7qr
+[
+  "TST7hcfecSc25mC7ecPJJj1e99C9SPSPH65DnUJEQBsdyPqkqFdRF",
+  "5K1mfzcby1w1UDAk2vvhSZYnJZRmmJNFvSfTdFPfyFcxmAxBNv2"
+]
+
+create_account_with_keys initminer2 zy2  "" TST8NpontdSMokAXCiBu1JAG73Wb8DBk5vhmgdeatnpLC5iuBvYnG TST7FqCkVxa6CHVKyYfbeRPJewEYKroKp5noVeHSWLjpXy42C9Yu4 TST6qKhaHMFKK9WruRipqgfJRRMrkueCSBhiJWjrysZ1hreeaaDMS TST7hcfecSc25mC7ecPJJj1e99C9SPSPH65DnUJEQBsdyPqkqFdRF true
+
+import_key 5JhcHvLNqv3PeXbr96WRq3hP6WVaoYe7caZXBuU9hEN49eb8m93
+
+transfer_to_vesting initminer2 zy2  "20.000 TESTS" true
+
+
+update_witness zy2 "101.76.216.9:8090" TST6tCqVuBZinnE8XaKuhEGpV2APYhknhL285uHD35G14yWBT9Ekw {} true
+
+

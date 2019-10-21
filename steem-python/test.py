@@ -159,10 +159,10 @@ class GroupSignature():
 def main():
     # 假设不存在不可用节点(无法判断节点状态)
     k = 2
-    n =3
+    n =2
     nodelist =[
-        'http://101.76.221.144:8090',
-        'http://101.76.221.115:8090',
+        'http://101.76.212.247:8090',
+        'http://101.76.212.247:8094',
         'http://101.76.221.115:8092'
 
     ]
@@ -194,6 +194,8 @@ def main():
     print(UID)
 #connect node and private posting key
 # 记录可用节点的编号！！！！！！
+
+    #该循环仅获得gvki和uski 并通过gvki验证uski的正确性
     for i in range(n):
         clientlist.append(steem.Steem(nodes=[nodelist[i]],keys=["5JHKRW4d7BTU1V1CXDQAPmDfBBFr6XqQoDDUpmPP1JW38s5NjeW"]))
         
@@ -215,21 +217,25 @@ def main():
             count = count + 1
         else:
             print("key is invalide\n\n")
+
     if count< k:
         print("there is not k admin\n")
         return 
-    
+
+    #通过uski计算出最终的usk
     usk = group_signature.uskGen(usklist, pk, GID, UID, L,k)
     # print(pk)
-    
+
+    # ---------------------------------------------------commit 开始
     account = 'initminer2'
     author = 'nya'
     title = "title"
     body = "body"
-    
+
+    #对title进行群签名得到sig
     sig = group_signature.sign(title,usk, pk,GID, UID,groupID)
 
-    json_metadata = " "
+    json_metadata = "abc"
     permlink = ''.join(random.choices(string.digits, k=4))
 
     print("permlink is " + permlink)
@@ -253,6 +259,8 @@ def main():
             "s3":str(sig['s3'])
         }
     )
+
+    #该操作由第二个账户进行
     tx = TransactionBuilder(steemd_instance=clientlist[1].steemd,wallet_instance = clientlist[0].wallet,no_broadcast = False)
 
     tx.appendOps(op)
@@ -260,12 +268,14 @@ def main():
 
     tx.sign()
     re = tx.broadcast()
+    #---------------------------------------------------commit 结束
 
+    # ---------------------------------------------------open 开始
     okliststr=[]
     oklist = []
     i = 0
     for client in clientlist:
-        okstr = client.get_ok(str(sig['e1']),str(sig['e2']))
+        okstr = client.get_ok(str(sig['e1']),str(sig['e2'])) #每个节点返回ok1和ok2
         print(okstr)
         okliststr.append(okstr)
         i = i + 1    
@@ -273,11 +283,13 @@ def main():
     if i < k:
         print("the number of ok is not enough\n")
         return
-    
+
+    #通过ok1和ok2   计算lameda
     lam = group_signature.open(okliststr,L,k)
     
-    E = (pk['n'] ** UID) * lam
-    
+    E = (pk['n'] ** UID) * lam #计算出e3  即签名的e3 判断是否相等
+    print("e3",E)
+
     op = operations.ApplyOpen(
         **{
             'account':account,
@@ -295,8 +307,8 @@ def main():
     tx.sign()
     # time.sleep(5)
     re = tx.broadcast()
-    print(re)
-
+    print("re",re)
+    # ---------------------------------------------------open 结束
     return
 
 if __name__ == "__main__":

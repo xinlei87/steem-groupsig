@@ -1,0 +1,40 @@
+suggest_brain_key
+{
+  "brain_priv_key": "LUSTER STEEPEN ITACIST SODOKU UNKIND ANHINGA KAIWI ERGOTIC GREIGE SEAWIFE EXPAND GUANACO CHERVIL YETAPA WAUF RESEISE",
+  "wif_priv_key": "5JKgNz54vJJimUjUawF9bDDh9SS4WtNMsGqtF8SbsUYp2EdBnJV",
+  "pub_key": "TST8iqbmTmzW7WcDBphfmWwwJf5xamAkEv6pa63tuBKKJf4mJttZc"
+}
+
+get_private_key_from_password zy4 owner 5JKgNz54vJJimUjUawF9bDDh9SS4WtNMsGqtF8SbsUYp2EdBnJV
+[
+  "TST7NVn8jphZDVDh4asTwGnL5eT1nmNYKgENSyo4Lg2yEgQSsVojn",
+  "5Ki6YAo8C1sTYWdZGLtc1Zu4kyaWMhAJbh3X4BxpHyCEzZeZLNg"
+]
+
+get_private_key_from_password zy4 active 5JKgNz54vJJimUjUawF9bDDh9SS4WtNMsGqtF8SbsUYp2EdBnJV
+[
+  "TST6jn3rDQ76qSSmgPCZtm7o31VG8FXqRJAFHxZnocPS8BxgtG5sF",
+  "5KKFadLPpA7QZymJkxS394skxHPte3AKtghK9pLMnxXfk469Pmg"
+]
+
+get_private_key_from_password zy4 posting 5JKgNz54vJJimUjUawF9bDDh9SS4WtNMsGqtF8SbsUYp2EdBnJV
+[
+  "TST79ktC1BwffnSTpvjx5CSiEMYSt6BVvHF3sUdSCukpHecED73Rx",
+  "5K2ECbfRKjQm9XgQ1HX8bur1LDijeEnQkXSEuiXoKUG4W8JZy27"
+]
+
+get_private_key_from_password zy4 memo 5JKgNz54vJJimUjUawF9bDDh9SS4WtNMsGqtF8SbsUYp2EdBnJV
+[
+  "TST6XN6nXyBB3xXeJh9VxKBbpn1HSmGMMtc4ZzjtfsRgFARWPQwuk",
+  "5KH9GmAnhUMLTWuYkjFf5cXVRb1ntHanakkxkWTNzkuAjjfCnGt"
+]
+
+import_key 5J3yMruND2TADZ7cZc6Cnp4VePrnehei2wvGdnLgf3aEj2nDGhc   //initminer2 private-key 理论上需要acctivekey
+
+create_account_with_keys initminer2 zy4  "" TST7NVn8jphZDVDh4asTwGnL5eT1nmNYKgENSyo4Lg2yEgQSsVojn TST6jn3rDQ76qSSmgPCZtm7o31VG8FXqRJAFHxZnocPS8BxgtG5sF TST79ktC1BwffnSTpvjx5CSiEMYSt6BVvHF3sUdSCukpHecED73Rx TST6XN6nXyBB3xXeJh9VxKBbpn1HSmGMMtc4ZzjtfsRgFARWPQwuk true
+
+transfer_to_vesting initminer2 zy4  "20.000 TESTS" true
+
+import_key 5KKFadLPpA7QZymJkxS394skxHPte3AKtghK9pLMnxXfk469Pmg  //zy1的activekey
+
+update_witness zy4 "101.76.212.247:8094" TST8iqbmTmzW7WcDBphfmWwwJf5xamAkEv6pa63tuBKKJf4mJttZc {} true  //zy1的pubkey
